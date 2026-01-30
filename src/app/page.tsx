@@ -23,15 +23,19 @@ export default function Home() {
       {/* Floating gradient blobs with parallax */}
       <div
         className="blob blob-1"
-        style={{ transform: `translate(0, ${parallaxOffset * 0.5}px)` }}
+        style={{ '--rotation': '-15deg', transform: `translate(0, ${parallaxOffset * 0.5}px) rotate(-15deg)` } as React.CSSProperties}
       />
       <div
         className="blob blob-2"
-        style={{ transform: `translate(0, ${parallaxOffset * 0.3}px)` }}
+        style={{ '--rotation': '20deg', transform: `translate(0, ${parallaxOffset * 0.3}px) rotate(20deg)` } as React.CSSProperties}
       />
       <div
         className="blob blob-3"
-        style={{ transform: `translate(0, ${parallaxOffset * 0.4}px)` }}
+        style={{ '--rotation': '-25deg', transform: `translate(0, ${parallaxOffset * 0.4}px) rotate(-25deg)` } as React.CSSProperties}
+      />
+      <div
+        className="blob blob-4"
+        style={{ '--rotation': '35deg', transform: `translate(0, ${parallaxOffset * 0.35}px) rotate(35deg)` } as React.CSSProperties}
       />
 
       {/* Content container */}
@@ -54,22 +58,26 @@ export default function Home() {
         </header>
 
         {/* Problem & Solution Section */}
-        <section className="grid md:grid-cols-2 gap-6 mb-12">
+        <section className="grid md:grid-cols-2 gap-6 mb-12 items-stretch">
           <ScrollReveal>
-            <div className="glass-card p-8 h-full">
-              <h2 className="section-heading text-sm mb-4 text-center">THE PROBLEM</h2>
-              <p className="body-text text-center">
-                Digital communication is broken. Text-based messaging accounts for less than 20% of human communication, the rest is paralinguistic cues like tone, timing, and emotion. This gap leaves people feeling disconnected and makes digital interaction feel transactional rather than human.
-              </p>
+            <div className="glass-card p-8 h-full flex flex-col">
+              <h2 className="section-heading text-lg md:text-xl mb-6 text-center">THE PROBLEM</h2>
+              <div className="flex-1 flex items-center">
+                <p className="body-text text-center">
+                  Digital communication is broken. Text-based messaging accounts for less than 20% of human communication, the rest is paralinguistic cues like tone, timing, and emotion. This gap leaves people feeling disconnected and makes digital interaction feel transactional rather than human.
+                </p>
+              </div>
             </div>
           </ScrollReveal>
 
           <ScrollReveal delay={100}>
-            <div className="glass-card p-8 h-full">
-              <h2 className="section-heading text-sm mb-4 text-center">THE SOLUTION</h2>
-              <p className="body-text text-center">
-                GIOIA reimagines digital products with design and user experience as the foundation. Our first product, <em>balo</em>, is a new communication platform built to bridge the nonverbal gap by focusing on how people experience connection over time. Through thoughtful design research, we study how conversation dynamics, emotional context, and shared moments shape human relationships, and use those insights to create more meaningful digital communication.
-              </p>
+            <div className="glass-card p-8 h-full flex flex-col">
+              <h2 className="section-heading text-lg md:text-xl mb-6 text-center">THE SOLUTION</h2>
+              <div className="flex-1 flex items-center">
+                <p className="body-text text-center">
+                  GIOIA reimagines digital products with design and user experience as the foundation. Our first product, <em>balo</em>, is a new communication platform built to bridge the nonverbal gap by focusing on how people experience connection over time. Through thoughtful design research, we study how conversation dynamics, emotional context, and shared moments shape human relationships, and use those insights to create more meaningful digital communication.
+                </p>
+              </div>
             </div>
           </ScrollReveal>
         </section>
@@ -80,13 +88,13 @@ export default function Home() {
             <div className="glass-card p-10">
               <div className="grid md:grid-cols-2 gap-10">
                 <div>
-                  <h2 className="section-heading text-sm mb-4 text-center">WHY THIS MATTERS</h2>
+                  <h2 className="section-heading text-lg md:text-xl mb-6 text-center">WHY THIS MATTERS</h2>
                   <p className="body-text text-center">
                     Better communication = better AI. When people enjoy communicating, they communicate more. More communication means richer data for AI training. We believe AI should feel invisible. Present but not intrusive, seamlessly integrated into daily life. Our platform becomes an extension of the user, understanding communication patterns across neurotypes and preferences, enabling AI that truly understands individuals.
                   </p>
                 </div>
                 <div>
-                  <h2 className="section-heading text-sm mb-4 text-center">WHY NOW</h2>
+                  <h2 className="section-heading text-lg md:text-xl mb-6 text-center">WHY NOW</h2>
                   <p className="body-text text-center">
                     While major tech companies are distracted with incremental improvements, we have the opportunity to fundamentally rethink communication. The digital landscape is consolidating between US, Russia and China. Central Asia represents a unique opportunity to build an independent pillar of global AI infrastructure. True innovation doesn&apos;t come from asking users what they want, it comes from deep research into human behavior and surprising them with something better.
                   </p>
@@ -99,14 +107,14 @@ export default function Home() {
         {/* Market Strategy Section */}
         <section className="mb-16">
           <ScrollReveal>
-            <h2 className="section-heading text-xl md:text-2xl text-center mb-10">
+            <h2 className="section-heading text-2xl md:text-3xl text-center mb-10">
               MARKET STRATEGY
             </h2>
           </ScrollReveal>
 
-          <div className="grid md:grid-cols-2 gap-6 mb-10">
+          <div className="grid md:grid-cols-2 gap-6 mb-10 items-stretch">
             <ScrollReveal delay={100}>
-              <div className="glass-pill px-8 py-6">
+              <div className="glass-pill px-8 py-6 h-full flex items-center justify-center">
                 <p className="body-text text-center">
                   <strong className="font-heading text-xs uppercase tracking-wider">Initial Market:</strong>{' '}
                   Central Asia, a region currently served primarily by Western, Chinese, and Russian tech infrastructure, but with limited local ownership and control.
@@ -115,7 +123,7 @@ export default function Home() {
             </ScrollReveal>
 
             <ScrollReveal delay={200}>
-              <div className="glass-pill px-8 py-6">
+              <div className="glass-pill px-8 py-6 h-full flex items-center justify-center">
                 <p className="body-text text-center">
                   <strong className="font-heading text-xs uppercase tracking-wider">Strategic Advantage:</strong>{' '}
                   We&apos;re working to give countries more sovereignty over their digital infrastructure. Local data centers will allow citizens and governments to maintain privacy and control. Data can then be used to train localized AI models.
@@ -146,7 +154,7 @@ export default function Home() {
         {/* Current Designs Section */}
         <section className="mb-16">
           <ScrollReveal>
-            <h2 className="section-heading text-xl md:text-2xl text-center mb-10">
+            <h2 className="section-heading text-2xl md:text-3xl text-center mb-10">
               CURRENT DESIGNS
             </h2>
           </ScrollReveal>
@@ -291,7 +299,7 @@ function ScrollReveal({
   return (
     <div
       ref={ref}
-      className={`transition-all duration-700 ease-out ${
+      className={`transition-all duration-700 ease-out h-full ${
         isVisible
           ? 'opacity-100 translate-y-0'
           : 'opacity-0 translate-y-8'
