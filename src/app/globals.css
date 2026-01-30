@@ -13,8 +13,8 @@
   --color-shadow-purple: rgba(90, 70, 110, 0.15);
 
   /* Typography */
-  --font-heading: 'Montserrat', sans-serif;
-  --font-body: 'Playfair Display', serif;
+  --font-heading: 'Montserrat', sans-serif;           /* For GIOIA logo and section headers */
+  --font-body: 'Cormorant Garamond', Georgia, serif;  /* For balo and body text */
 
   /* ===========================================
      GLASS TUNING - Adjust these to tune glass effect
@@ -301,9 +301,9 @@ body {
   color: #1a1a1a;
 }
 
-/* Brand logo styling */
+/* Brand logo styling - GIOIA uses Montserrat */
 .brand-logo {
-  font-family: var(--font-body);
+  font-family: var(--font-heading);
   font-weight: 700;
   letter-spacing: 0.05em;
 }

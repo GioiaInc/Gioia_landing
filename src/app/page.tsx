@@ -44,7 +44,7 @@ export default function Home() {
         {/* Header Section */}
         <header className="text-center mb-16">
           <div className="flex items-center justify-center gap-4 mb-4">
-            <h1 className="brand-logo text-5xl md:text-6xl text-[#4a3f55] tracking-wide">
+            <h1 className="font-heading font-bold text-5xl md:text-6xl text-[#4a3f55] tracking-wide">
               GIOIA
             </h1>
             <span className="text-4xl md:text-5xl text-[#9b85a8] font-light">|</span>
@@ -241,7 +241,7 @@ export default function Home() {
         <footer className="text-center pt-8 pb-16 border-t border-[#d4c8e0]/30">
           <ScrollReveal>
             <div className="mb-8">
-              <span className="brand-logo text-3xl text-[#5c4d6b]">GIOIA</span>
+              <span className="font-heading font-bold text-3xl text-[#5c4d6b]">GIOIA</span>
               <span className="mx-3 text-[#9b85a8]">·</span>
               <span className="font-body italic text-lg text-[#7d6b8a]">
                 Reimagining digital experience through design
@@ -250,15 +250,34 @@ export default function Home() {
 
             {/* Contact Section */}
             <div className="contact-glass inline-block px-10 py-6">
-              <h3 className="font-heading text-sm uppercase tracking-wider text-white/90 mb-3">
+              <h3 className="font-heading text-sm uppercase tracking-wider text-white/90 mb-4">
                 Get in Touch
               </h3>
-              <a
-                href="mailto:hello@gioia.io"
-                className="font-body text-xl text-white/80 hover:text-white transition-colors"
-              >
-                hello@gioia.io
-              </a>
+              <div className="flex items-center justify-center gap-6">
+                <a
+                  href="mailto:Sharifisaeed@outlook.com"
+                  className="font-body text-lg text-white/80 hover:text-white transition-colors"
+                >
+                  Sharifisaeed@outlook.com
+                </a>
+                <a
+                  href="https://www.linkedin.com/in/saeed--sharifi/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white/80 hover:text-white transition-colors"
+                  aria-label="LinkedIn"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                  </svg>
+                </a>
+              </div>
             </div>
           </ScrollReveal>
         </footer>
