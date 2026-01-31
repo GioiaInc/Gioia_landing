@@ -255,10 +255,10 @@ export default function Home() {
               </h3>
               <div className="flex items-center justify-center gap-6">
                 <a
-                  href="mailto:Sharifisaeed@outlook.com"
+                  href="mailto:sharifisaeed@outlook.com"
                   className="font-body text-lg text-white/80 hover:text-white transition-colors"
                 >
-                  Sharifisaeed@outlook.com
+                  sharifisaeed@outlook.com
                 </a>
                 <a
                   href="https://www.linkedin.com/in/saeed--sharifi/"
