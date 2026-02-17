@@ -22,9 +22,16 @@ export const docs: DocEntry[] = [
     category: 'Strategy',
   },
   {
+    slug: 'executive-meeting-feb-17',
+    title: 'All-Team Meeting Summary',
+    subtitle: 'Full team — product, AI, infrastructure, vision',
+    date: '2026-02-17',
+    category: 'Meetings',
+  },
+  {
     slug: 'executive-meeting-feb-15',
-    title: 'Executive Meeting Summary',
-    subtitle: 'AI strategy session — Roman & Kambar',
+    title: 'AI Strategy Meeting',
+    subtitle: 'Roman & Kambar — ambient AI direction',
     date: '2026-02-15',
     category: 'Meetings',
   },
