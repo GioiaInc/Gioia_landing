@@ -312,154 +312,104 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
         }
 
         /* --- Hub Page --- */
-        .docs-hub {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          min-height: calc(100vh - 60px);
-          padding: 4rem 2rem;
+        .docs-hub-list {
+          max-width: 640px;
+          margin: 0 auto;
+          padding: 4rem 2rem 6rem;
         }
         .docs-hub-title {
           font-family: 'Cormorant Garamond', Georgia, serif;
           font-weight: 300;
           font-size: 3.2rem;
           color: #1a1a1a;
-          margin: 0 0 1rem;
+          margin: 0 0 3.5rem;
         }
-        .docs-hub-sub {
-          font-size: 1.15rem;
-          color: #8a8580;
-          font-style: italic;
-          margin-bottom: 5rem;
+        @media (max-width: 540px) {
+          .docs-hub-list { padding: 2.5rem 1.5rem 4rem; }
+          .docs-hub-title { font-size: 2.4rem; margin-bottom: 2.5rem; }
         }
 
-        /* --- Circular Selector --- */
-        .docs-orbit {
-          position: relative;
-          width: 420px;
-          height: 420px;
+        /* --- Month Groups --- */
+        .docs-month-group {
+          margin-bottom: 2.5rem;
         }
-        @media (max-width: 640px) {
-          .docs-orbit {
-            width: 300px;
-            height: 300px;
-          }
-        }
-        .docs-orbit-center {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: 6px;
-          height: 6px;
-          border-radius: 50%;
-          background: #ddd8d2;
-        }
-        .docs-orbit-ring {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: 280px;
-          height: 280px;
-          border-radius: 50%;
-          border: 1px solid #ece8e3;
-        }
-        @media (max-width: 640px) {
-          .docs-orbit-ring {
-            width: 200px;
-            height: 200px;
-          }
-        }
-        .docs-orbit-item {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          text-decoration: none;
-          color: #1a1a1a;
-          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .docs-orbit-item-inner {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          text-align: center;
-          padding: 1.2rem 1.5rem;
-          background: #faf9f6;
-          border: 1px solid transparent;
-          border-radius: 2px;
-          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-          min-width: 130px;
-        }
-        .docs-orbit-item:hover .docs-orbit-item-inner {
-          border-color: #e8e4df;
-          background: #f5f2ee;
-        }
-        .docs-orbit-item-title {
-          font-family: 'Cormorant Garamond', Georgia, serif;
-          font-weight: 600;
-          font-size: 1.1rem;
-          line-height: 1.3;
-          margin-bottom: 0.25rem;
-        }
-        .docs-orbit-item-sub {
-          font-size: 0.85rem;
-          color: #a09890;
-          font-style: italic;
-        }
-        .docs-orbit-item-cat {
+        .docs-month-label {
           font-family: 'Montserrat', sans-serif;
-          font-size: 0.55rem;
+          font-weight: 600;
+          font-size: 0.6rem;
           letter-spacing: 0.2em;
           text-transform: uppercase;
-          color: #c17c5f;
-          margin-top: 0.5rem;
+          color: #a09890;
+          margin: 0 0 1rem;
+          padding-bottom: 0.75rem;
+          border-bottom: 1px solid #e8e4df;
         }
 
-        /* --- Mobile: stack vertically --- */
-        .docs-list-mobile {
-          display: none;
-          flex-direction: column;
-          gap: 1px;
-          width: 100%;
-          max-width: 480px;
-          margin: 0 auto;
-        }
-        .docs-list-mobile-item {
+        /* --- Doc Entries --- */
+        .docs-entries {
           display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 1.4rem 0;
-          border-bottom: 1px solid #ece8e3;
+          flex-direction: column;
+        }
+        .docs-entry {
+          display: flex;
+          align-items: baseline;
+          gap: 1.5rem;
+          padding: 1rem 0;
+          border-bottom: 1px solid #f0ece7;
           text-decoration: none;
           color: #1a1a1a;
-          transition: opacity 0.3s ease;
+          transition: all 0.25s ease;
         }
-        .docs-list-mobile-item:first-child {
-          border-top: 1px solid #ece8e3;
+        .docs-entry:last-child {
+          border-bottom: none;
         }
-        .docs-list-mobile-item:hover {
-          opacity: 0.65;
+        .docs-entry:hover {
+          padding-left: 0.5rem;
         }
-        .docs-list-mobile-title {
-          font-weight: 500;
-          font-size: 1.15rem;
+        .docs-entry:hover .docs-entry-title {
+          color: #c17c5f;
         }
-        .docs-list-mobile-cat {
+        .docs-entry-date {
           font-family: 'Montserrat', sans-serif;
-          font-size: 0.55rem;
+          font-size: 0.65rem;
+          letter-spacing: 0.05em;
+          color: #b0aaa4;
+          min-width: 52px;
+          flex-shrink: 0;
+          padding-top: 0.15rem;
+        }
+        .docs-entry-body {
+          flex: 1;
+          min-width: 0;
+        }
+        .docs-entry-title {
+          font-family: 'Cormorant Garamond', Georgia, serif;
+          font-weight: 600;
+          font-size: 1.2rem;
+          line-height: 1.3;
+          display: block;
+          transition: color 0.25s ease;
+        }
+        .docs-entry-sub {
+          font-size: 0.95rem;
+          color: #8a8580;
+          font-style: italic;
+          display: block;
+          margin-top: 0.15rem;
+        }
+        .docs-entry-cat {
+          font-family: 'Montserrat', sans-serif;
+          font-size: 0.5rem;
           letter-spacing: 0.15em;
           text-transform: uppercase;
           color: #c17c5f;
+          flex-shrink: 0;
+          padding-top: 0.2rem;
         }
-
         @media (max-width: 540px) {
-          .docs-orbit { display: none; }
-          .docs-list-mobile { display: flex; }
-          .docs-hub-title { font-size: 2.4rem; }
-          .docs-hub { padding: 3rem 1.5rem; min-height: auto; }
-          .docs-hub-sub { margin-bottom: 2.5rem; }
+          .docs-entry { gap: 1rem; }
+          .docs-entry-date { min-width: 44px; }
+          .docs-entry-cat { display: none; }
         }
 
         /* --- Document Page --- */

@@ -4,13 +4,33 @@ import Link from 'next/link';
 import { docs } from '@/lib/docs-config';
 
 export default function DocsHub() {
-  const count = docs.length;
-  const radius = 170; // px from center
-  const radiusMobile = 120;
+  // Sort by date descending (newest first)
+  const sorted = [...docs].sort((a, b) => {
+    if (!a.date || !b.date) return 0;
+    return b.date.localeCompare(a.date);
+  });
+
+  // Group by month-year
+  const grouped: Record<string, typeof docs> = {};
+  for (const doc of sorted) {
+    const key = doc.date
+      ? new Date(doc.date + 'T00:00:00').toLocaleDateString('en-US', {
+          month: 'long',
+          year: 'numeric',
+        })
+      : 'Undated';
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(doc);
+  }
+
+  function formatDay(dateStr?: string) {
+    if (!dateStr) return '';
+    const d = new Date(dateStr + 'T00:00:00');
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
 
   return (
     <>
-      {/* Top bar */}
       <nav className="docs-topbar">
         <Link href="/docs" className="docs-topbar-brand">
           GIOIA Docs
@@ -22,62 +42,37 @@ export default function DocsHub() {
         </div>
       </nav>
 
-      {/* Hub */}
-      <div className="docs-hub">
+      <div className="docs-hub-list">
         <h1 className="docs-hub-title">Documents</h1>
-        <p className="docs-hub-sub">Select a document to view.</p>
 
-        {/* Circular orbit — desktop */}
-        <div className="docs-orbit">
-          <div className="docs-orbit-ring" />
-          <div className="docs-orbit-center" />
+        {Object.entries(grouped).map(([month, entries]) => (
+          <div key={month} className="docs-month-group">
+            <p className="docs-month-label">{month}</p>
 
-          {docs.map((doc, i) => {
-            const angle = (i / count) * 2 * Math.PI - Math.PI / 2; // start from top
-            const x = Math.cos(angle) * radius;
-            const y = Math.sin(angle) * radius;
-
-            return (
-              <Link
-                key={doc.slug}
-                href={`/docs/${doc.slug}`}
-                className="docs-orbit-item"
-                style={{
-                  transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`,
-                }}
-              >
-                <div className="docs-orbit-item-inner">
-                  <span className="docs-orbit-item-title">{doc.title}</span>
-                  {doc.subtitle && (
-                    <span className="docs-orbit-item-sub">{doc.subtitle}</span>
-                  )}
+            <div className="docs-entries">
+              {entries.map((doc) => (
+                <Link
+                  key={doc.slug}
+                  href={`/docs/${doc.slug}`}
+                  className="docs-entry"
+                >
+                  <div className="docs-entry-date">{formatDay(doc.date)}</div>
+                  <div className="docs-entry-body">
+                    <span className="docs-entry-title">{doc.title}</span>
+                    {doc.subtitle && (
+                      <span className="docs-entry-sub">{doc.subtitle}</span>
+                    )}
+                  </div>
                   {doc.category && (
-                    <span className="docs-orbit-item-cat">{doc.category}</span>
+                    <span className="docs-entry-cat">{doc.category}</span>
                   )}
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-
-        {/* Mobile list fallback */}
-        <div className="docs-list-mobile">
-          {docs.map((doc) => (
-            <Link
-              key={doc.slug}
-              href={`/docs/${doc.slug}`}
-              className="docs-list-mobile-item"
-            >
-              <span className="docs-list-mobile-title">{doc.title}</span>
-              {doc.category && (
-                <span className="docs-list-mobile-cat">{doc.category}</span>
-              )}
-            </Link>
-          ))}
-        </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
 
-      {/* Footer */}
       <footer className="docs-footer">
         <p className="docs-footer-text">&copy; 2026 GIOIA</p>
       </footer>

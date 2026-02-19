@@ -15,6 +15,13 @@ export interface DocEntry {
 
 export const docs: DocEntry[] = [
   {
+    slug: 'executive-meeting-feb-19',
+    title: 'Team Meeting: Design & Demo',
+    subtitle: 'Design evolution, investor prep, Tuesday demo',
+    date: '2026-02-19',
+    category: 'Meetings',
+  },
+  {
     slug: 'balo-ambient-ai-plan',
     title: 'Balo Ambient AI Plan',
     subtitle: 'On-device intelligence for the April prototype',
@@ -24,14 +31,14 @@ export const docs: DocEntry[] = [
   {
     slug: 'executive-meeting-feb-17',
     title: 'All-Team Meeting Summary',
-    subtitle: 'Full team — product, AI, infrastructure, vision',
+    subtitle: 'Full team, product, AI, infrastructure, vision',
     date: '2026-02-17',
     category: 'Meetings',
   },
   {
     slug: 'executive-meeting-feb-15',
     title: 'AI Strategy Meeting',
-    subtitle: 'Roman & Kambar — ambient AI direction',
+    subtitle: 'Roman & Kambar, ambient AI direction',
     date: '2026-02-15',
     category: 'Meetings',
   },
