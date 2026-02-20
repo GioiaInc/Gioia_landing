@@ -210,7 +210,7 @@ export default function Home() {
 
       {/* ===== SUBTITLE / INTRO ===== */}
       <section className="intro-section">
-        <WordReveal words={SUBTITLE_WORDS} />
+        <WordReveal key={lang} words={lang === 'en' ? SUBTITLE_EN : SUBTITLE_RU} />
       </section>
     </main>
   );

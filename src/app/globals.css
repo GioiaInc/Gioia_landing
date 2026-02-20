@@ -127,12 +127,17 @@ body {
   margin: 0;
 }
 
-/* Grain toggle button */
-.grain-toggle {
+/* Toggle buttons */
+.hero-toggles {
   position: absolute;
   bottom: 32px;
   right: 32px;
   z-index: 20;
+  display: flex;
+  gap: 8px;
+}
+
+.hero-toggle-btn {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.15);
   color: rgba(255, 255, 255, 0.4);
@@ -147,7 +152,7 @@ body {
   transition: all 0.2s ease;
 }
 
-.grain-toggle:hover {
+.hero-toggle-btn:hover {
   background: rgba(255, 255, 255, 0.12);
   color: rgba(255, 255, 255, 0.6);
 }
@@ -277,7 +282,7 @@ body {
     bottom: 24px;
   }
 
-  .grain-toggle {
+  .hero-toggles {
     bottom: 24px;
     right: 16px;
   }
