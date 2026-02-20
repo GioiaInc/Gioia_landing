@@ -46,8 +46,8 @@ function FilmGrain() {
     if (!ctx) return;
 
     const render = () => {
-      canvas.width = window.innerWidth / 2;
-      canvas.height = window.innerHeight / 2;
+      canvas.width = Math.ceil(window.innerWidth / 4);
+      canvas.height = Math.ceil(window.innerHeight / 4);
 
       const { width, height } = canvas;
       const imageData = ctx.createImageData(width, height);
@@ -58,7 +58,7 @@ function FilmGrain() {
         data[i] = v;
         data[i + 1] = v;
         data[i + 2] = v;
-        data[i + 3] = 20;
+        data[i + 3] = 14;
       }
 
       ctx.putImageData(imageData, 0, 0);
