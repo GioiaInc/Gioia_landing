@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "balo — by GIOIA",
+  title: "belo — by GIOIA",
   description: "A messaging platform designed to bridge the gap between digital communication and human presence.",
-  keywords: ["balo", "GIOIA", "messaging", "ambient AI", "communication platform", "Central Asia"],
+  keywords: ["belo", "GIOIA", "messaging", "ambient AI", "communication platform", "Central Asia"],
   authors: [{ name: "GIOIA" }],
   openGraph: {
-    title: "balo — by GIOIA",
+    title: "belo — by GIOIA",
     description: "Communication that feels closer to real presence.",
     type: "website",
   },
