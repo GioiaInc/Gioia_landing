@@ -230,6 +230,11 @@ export default function Home() {
               className={`hero-image ${i === heroIndex ? 'active' : ''}`}
             />
           ))}
+          <img
+            src="/images/hero-mobile.png"
+            alt="belo hero"
+            className={`hero-image hero-mobile-only ${heroIndex === 0 ? 'active' : ''}`}
+          />
         </div>
 
         {grainOn && <FilmGrain />}
@@ -242,24 +247,7 @@ export default function Home() {
         </div>
 
         <div className="scroll-hint">
-          <div className="scroll-icon" />
-          <span>Scroll to explore</span>
-        </div>
-
-        {/* Toggles */}
-        <div className="hero-toggles">
-          <button
-            className="hero-toggle-btn"
-            onClick={() => setGrainOn(!grainOn)}
-          >
-            grain {grainOn ? 'on' : 'off'}
-          </button>
-          <button
-            className="hero-toggle-btn"
-            onClick={() => setLang(lang === 'en' ? 'ru' : 'en')}
-          >
-            {lang === 'en' ? 'RU' : 'EN'}
-          </button>
+          <div className="scroll-chevron" />
         </div>
       </section>
 
