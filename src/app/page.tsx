@@ -1,330 +1,376 @@
 'use client';
 
-import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
-export default function Home() {
-  const [scrollY, setScrollY] = useState(0);
+
+const SUBTITLE_EN = [
+  '93%', 'of', 'communication', 'is', 'paralinguistic.', 'Tone,', 'timing,',
+  'pace,', 'emotion.', 'Current', 'messaging', 'captures', 'none', 'of', 'it.',
+  'belo', 'is', 'a', 'messaging', 'app', 'built', 'around', 'ambient', 'AI.',
+  'Lightweight', 'sentiment', 'models', 'process', 'everything', 'on-device,',
+  'in', 'real', 'time.', 'The', 'interface', 'reflects', 'the', 'emotional',
+  'state', 'of', 'the', 'conversation.', 'Colors', 'shift,', 'atmosphere',
+  'adapts,', 'nudges', 'appear', 'when', 'tone', 'gets', 'heated.',
+  'Nothing', 'leaves', 'the', 'phone.',
+];
+
+const SUBTITLE_RU = [
+  '93%', 'коммуникации', 'паралингвистика.', 'Тон,', 'ритм,', 'темп,',
+  'эмоция.', 'Современные', 'мессенджеры', 'не', 'передают', 'ничего',
+  'из', 'этого.', 'belo', 'это', 'мессенджер,', 'построенный', 'на',
+  'фоновом', 'ИИ.', 'Лёгкие', 'модели', 'анализа', 'тональности',
+  'работают', 'на', 'устройстве,', 'в', 'реальном', 'времени.',
+  'Интерфейс', 'отражает', 'эмоциональное', 'состояние', 'разговора.',
+  'Цвета', 'меняются,', 'атмосфера', 'адаптируется,', 'подсказки',
+  'появляются,', 'когда', 'тон', 'обостряется.',
+  'Ничего', 'не', 'покидает', 'телефон.',
+];
+
+function FilmGrain() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const render = () => {
+      canvas.width = window.innerWidth / 2;
+      canvas.height = window.innerHeight / 2;
+
+      const { width, height } = canvas;
+      const imageData = ctx.createImageData(width, height);
+      const data = imageData.data;
+
+      for (let i = 0; i < data.length; i += 4) {
+        const v = Math.random() * 255;
+        data[i] = v;
+        data[i + 1] = v;
+        data[i + 2] = v;
+        data[i + 3] = 20;
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+    };
+
+    render();
+    window.addEventListener('resize', render);
+    return () => window.removeEventListener('resize', render);
   }, []);
 
-  // Parallax calculation for background blobs
-  const parallaxOffset = scrollY * 0.3;
-
   return (
-    <main className="relative min-h-screen">
-      {/* Animated gradient background */}
-      <div className="gradient-bg" />
-
-      {/* Floating gradient blobs with parallax */}
-      <div
-        className="blob blob-1"
-        style={{ '--rotation': '-15deg', transform: `translate(0, ${parallaxOffset * 0.5}px) rotate(-15deg)` } as React.CSSProperties}
-      />
-      <div
-        className="blob blob-2"
-        style={{ '--rotation': '20deg', transform: `translate(0, ${parallaxOffset * 0.3}px) rotate(20deg)` } as React.CSSProperties}
-      />
-      <div
-        className="blob blob-3"
-        style={{ '--rotation': '-25deg', transform: `translate(0, ${parallaxOffset * 0.4}px) rotate(-25deg)` } as React.CSSProperties}
-      />
-      <div
-        className="blob blob-4"
-        style={{ '--rotation': '35deg', transform: `translate(0, ${parallaxOffset * 0.35}px) rotate(35deg)` } as React.CSSProperties}
-      />
-
-      {/* Content container */}
-      <div className="relative z-10 px-6 py-12 max-w-6xl mx-auto">
-
-        {/* Header Section */}
-        <header className="text-center mb-16">
-          <div className="flex items-center justify-center gap-4 mb-4">
-            <h1 className="font-heading font-bold text-5xl md:text-6xl text-[#4a3f55] tracking-wide">
-              GIOIA
-            </h1>
-            <span className="text-4xl md:text-5xl text-[#9b85a8] font-light">|</span>
-            <span className="font-body text-4xl md:text-5xl text-[#7d6b8a]">
-              balo
-            </span>
-          </div>
-          <p className="font-body italic text-xl md:text-2xl text-[#5c4d6b] max-w-2xl mx-auto">
-            Building AI infrastructure through <span className="font-semibold">exceptional design</span>
-          </p>
-        </header>
-
-        {/* Problem & Solution Section */}
-        <section className="grid md:grid-cols-2 gap-6 mb-12 items-stretch">
-          <ScrollReveal>
-            <div className="glass-card p-8 h-full flex flex-col">
-              <h2 className="section-heading text-lg md:text-xl mb-6 text-center">THE PROBLEM</h2>
-              <div className="flex-1 flex items-center">
-                <p className="body-text text-center">
-                  Digital communication is broken. Text-based messaging accounts for less than 20% of human communication, the rest is paralinguistic cues like tone, timing, and emotion. This gap leaves people feeling disconnected and makes digital interaction feel transactional rather than human.
-                </p>
-              </div>
-            </div>
-          </ScrollReveal>
-
-          <ScrollReveal delay={100}>
-            <div className="glass-card p-8 h-full flex flex-col">
-              <h2 className="section-heading text-lg md:text-xl mb-6 text-center">THE SOLUTION</h2>
-              <div className="flex-1 flex items-center">
-                <p className="body-text text-center">
-                  GIOIA reimagines digital products with design and user experience as the foundation. Our first product, <em>balo</em>, is a new communication platform built to bridge the nonverbal gap by focusing on how people experience connection over time. Through thoughtful design research, we study how conversation dynamics, emotional context, and shared moments shape human relationships, and use those insights to create more meaningful digital communication.
-                </p>
-              </div>
-            </div>
-          </ScrollReveal>
-        </section>
-
-        {/* Why This Matters & Why Now Section */}
-        <section className="mb-16">
-          <ScrollReveal>
-            <div className="glass-card p-10">
-              <div className="grid md:grid-cols-2 gap-10">
-                <div>
-                  <h2 className="section-heading text-lg md:text-xl mb-6 text-center">WHY THIS MATTERS</h2>
-                  <p className="body-text text-center">
-                    Better communication = better AI. When people enjoy communicating, they communicate more. More communication means richer data for AI training. We believe AI should feel invisible. Present but not intrusive, seamlessly integrated into daily life. Our platform becomes an extension of the user, understanding communication patterns across neurotypes and preferences, enabling AI that truly understands individuals.
-                  </p>
-                </div>
-                <div>
-                  <h2 className="section-heading text-lg md:text-xl mb-6 text-center">WHY NOW</h2>
-                  <p className="body-text text-center">
-                    While major tech companies are distracted with incremental improvements, we have the opportunity to fundamentally rethink communication. The digital landscape is consolidating between US, Russia and China. Central Asia represents a unique opportunity to build an independent pillar of global AI infrastructure. True innovation doesn&apos;t come from asking users what they want, it comes from deep research into human behavior and surprising them with something better.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </ScrollReveal>
-        </section>
-
-        {/* Market Strategy Section */}
-        <section className="mb-16">
-          <ScrollReveal>
-            <h2 className="section-heading text-2xl md:text-3xl text-center mb-10">
-              MARKET STRATEGY
-            </h2>
-          </ScrollReveal>
-
-          <div className="grid md:grid-cols-2 gap-6 mb-10 items-stretch">
-            <ScrollReveal delay={100}>
-              <div className="glass-pill px-8 py-6 h-full flex items-center justify-center">
-                <p className="body-text text-center">
-                  <strong className="font-heading text-xs uppercase tracking-wider">Initial Market:</strong>{' '}
-                  Central Asia, a region currently served primarily by Western, Chinese, and Russian tech infrastructure, but with limited local ownership and control.
-                </p>
-              </div>
-            </ScrollReveal>
-
-            <ScrollReveal delay={200}>
-              <div className="glass-pill px-8 py-6 h-full flex items-center justify-center">
-                <p className="body-text text-center">
-                  <strong className="font-heading text-xs uppercase tracking-wider">Strategic Advantage:</strong>{' '}
-                  We&apos;re working to give countries more sovereignty over their digital infrastructure. Local data centers will allow citizens and governments to maintain privacy and control. Data can then be used to train localized AI models.
-                </p>
-              </div>
-            </ScrollReveal>
-          </div>
-
-          {/* Growth Loop Flow */}
-          <ScrollReveal delay={300}>
-            <div className="text-center py-8">
-              <p className="font-body text-lg md:text-xl text-[#4a3f55] leading-relaxed">
-                <em>balo</em> attracts users{' '}
-                <span className="flow-arrow text-[#9b85a8]">→</span>{' '}
-                regular interactions produce data{' '}
-                <span className="flow-arrow text-[#9b85a8]">→</span>{' '}
-                data enhances regional AI{' '}
-                <span className="flow-arrow text-[#9b85a8]">→</span>
-                <br className="hidden md:block" />
-                AI spreads to sectors like banking, healthcare, and education{' '}
-                <span className="flow-arrow text-[#9b85a8]">→</span>{' '}
-                growing ecosystem
-              </p>
-            </div>
-          </ScrollReveal>
-        </section>
-
-        {/* Current Designs Section */}
-        <section className="mb-16">
-          <ScrollReveal>
-            <h2 className="section-heading text-2xl md:text-3xl text-center mb-10">
-              CURRENT DESIGNS
-            </h2>
-          </ScrollReveal>
-
-          {/* Phone Mockups */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
-            {/* Dark theme phones */}
-            <ScrollReveal delay={0}>
-              <div className="phone-mockup">
-                <Image
-                  src="/images/phone-dark-1.png"
-                  alt="balo app dark theme - constellation view"
-                  width={300}
-                  height={600}
-                  className="w-full h-auto rounded-3xl"
-                />
-              </div>
-            </ScrollReveal>
-
-            <ScrollReveal delay={50}>
-              <div className="phone-mockup">
-                <Image
-                  src="/images/phone-dark-2.png"
-                  alt="balo app dark theme - connections"
-                  width={300}
-                  height={600}
-                  className="w-full h-auto rounded-3xl"
-                />
-              </div>
-            </ScrollReveal>
-
-            <ScrollReveal delay={100}>
-              <div className="phone-mockup">
-                <Image
-                  src="/images/phone-dark-3.png"
-                  alt="balo app dark theme - network"
-                  width={300}
-                  height={600}
-                  className="w-full h-auto rounded-3xl"
-                />
-              </div>
-            </ScrollReveal>
-
-            {/* Light theme phones */}
-            <ScrollReveal delay={150}>
-              <div className="phone-mockup">
-                <Image
-                  src="/images/phone-light-1.png"
-                  alt="balo app light theme - constellation"
-                  width={300}
-                  height={600}
-                  className="w-full h-auto rounded-3xl"
-                />
-              </div>
-            </ScrollReveal>
-
-            <ScrollReveal delay={200}>
-              <div className="phone-mockup">
-                <Image
-                  src="/images/phone-light-2.png"
-                  alt="balo app light theme - connections"
-                  width={300}
-                  height={600}
-                  className="w-full h-auto rounded-3xl"
-                />
-              </div>
-            </ScrollReveal>
-
-            <ScrollReveal delay={250}>
-              <div className="phone-mockup">
-                <Image
-                  src="/images/phone-light-3.png"
-                  alt="balo app light theme - network"
-                  width={300}
-                  height={600}
-                  className="w-full h-auto rounded-3xl"
-                />
-              </div>
-            </ScrollReveal>
-          </div>
-        </section>
-
-        {/* Footer */}
-        <footer className="text-center pt-8 pb-16 border-t border-[#d4c8e0]/30">
-          <ScrollReveal>
-            <div className="mb-8">
-              <span className="font-heading font-bold text-3xl text-[#5c4d6b]">GIOIA</span>
-              <span className="mx-3 text-[#9b85a8]">·</span>
-              <span className="font-body italic text-lg text-[#7d6b8a]">
-                Reimagining digital experience through design
-              </span>
-            </div>
-
-            {/* Contact Section */}
-            <div className="contact-glass inline-block px-10 py-6">
-              <h3 className="font-heading text-sm uppercase tracking-wider text-white/90 mb-4">
-                Get in Touch
-              </h3>
-              <div className="flex items-center justify-center gap-6">
-                <a
-                  href="mailto:sharifisaeed@outlook.com"
-                  className="font-body text-lg text-white/80 hover:text-white transition-colors"
-                >
-                  sharifisaeed@outlook.com
-                </a>
-                <a
-                  href="https://www.linkedin.com/in/saeed--sharifi/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-white/80 hover:text-white transition-colors"
-                  aria-label="LinkedIn"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                  </svg>
-                </a>
-              </div>
-            </div>
-          </ScrollReveal>
-        </footer>
-      </div>
-    </main>
+    <canvas
+      ref={canvasRef}
+      className="grain"
+    />
   );
 }
 
-// Scroll reveal component for animations
-function ScrollReveal({
-  children,
-  delay = 0
-}: {
-  children: React.ReactNode;
-  delay?: number;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
+function WordReveal({ words }: { words: string[] }) {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [visibleCount, setVisibleCount] = useState(0);
 
   useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setTimeout(() => setIsVisible(true), delay);
-          observer.unobserve(entry.target);
+          // Start revealing words
+          let count = 0;
+          const interval = setInterval(() => {
+            count++;
+            setVisibleCount(count);
+            if (count >= words.length) clearInterval(interval);
+          }, 70);
+          observer.disconnect();
+          return () => clearInterval(interval);
         }
       },
-      { threshold: 0.1, rootMargin: '50px' }
+      { threshold: 0.3 }
     );
 
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
-
+    observer.observe(section);
     return () => observer.disconnect();
-  }, [delay]);
+  }, [words.length]);
+
+  return (
+    <div ref={sectionRef} className="word-reveal-section">
+      <p className="word-reveal-text">
+        {words.map((word, i) => (
+          <span
+            key={i}
+            className={`word ${i < visibleCount ? 'visible' : ''}`}
+          >
+            {word}{' '}
+          </span>
+        ))}
+      </p>
+    </div>
+  );
+}
+
+function FadeIn({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.15 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div
       ref={ref}
-      className={`transition-all duration-700 ease-out h-full ${
-        isVisible
-          ? 'opacity-100 translate-y-0'
-          : 'opacity-0 translate-y-8'
-      }`}
+      className={`fade-in ${visible ? 'visible' : ''} ${className}`}
+      style={delay ? { transitionDelay: `${delay}s` } : undefined}
     >
       {children}
     </div>
+  );
+}
+
+function ImageBreak({ src, alt = '' }: { src: string; alt?: string }) {
+  return (
+    <section className="image-break">
+      <img src={src} alt={alt} className="break-image" />
+      <div className="break-fade-top" />
+      <div className="break-fade-bottom" />
+    </section>
+  );
+}
+
+export default function Home() {
+  const [loaded, setLoaded] = useState(false);
+  const [grainOn, setGrainOn] = useState(false);
+  const [lang, setLang] = useState<'en' | 'ru'>('en');
+  const [formOpen, setFormOpen] = useState(false);
+  const heroContentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoaded(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const el = heroContentRef.current;
+    if (!el) return;
+
+    const onScroll = () => {
+      const y = window.scrollY;
+      el.style.transform = `translateY(${y * -0.35}px)`;
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  return (
+    <main>
+      {/* ===== HERO ===== */}
+      <section className="hero">
+        <div className="hero-image-wrap">
+          <img src="/images/hero-1.webp" alt="belo hero" className="hero-image active" />
+          <img src="/images/hero-mobile.webp" alt="belo hero" className="hero-image hero-mobile-only active" />
+        </div>
+
+        {grainOn && <FilmGrain />}
+
+        <div className="hero-fade" />
+
+        <div ref={heroContentRef} className={`hero-content ${loaded ? 'visible' : ''}`}>
+          <h1 className="hero-title">belo</h1>
+          <p className="hero-byline">by GIOIA</p>
+        </div>
+
+        <div className="scroll-hint">
+          <div className="scroll-chevron" />
+        </div>
+      </section>
+
+      {/* ===== SUBTITLE / INTRO ===== */}
+      <section className="intro-section">
+        <WordReveal key={lang} words={lang === 'en' ? SUBTITLE_EN : SUBTITLE_RU} />
+      </section>
+
+      {/* ===== HOW IT WORKS ===== */}
+      <section className="features-section">
+        <FadeIn>
+          <p className="section-label">How it works</p>
+          <h2 className="section-heading">Three ambient AI features, all on-device</h2>
+        </FadeIn>
+
+        <div className="feature-row">
+          <FadeIn className="feature-visual">
+            <img src="/images/belo_semantic_phone.webp" alt="" className="feature-image" />
+          </FadeIn>
+          <FadeIn className="feature-text" delay={0.15}>
+            <h3>Semantic Mood Detection</h3>
+            <p>Real-time sentiment analysis changes the visual atmosphere of a chat. Colors, effects, and background shift based on the emotional state of both people in the conversation.</p>
+          </FadeIn>
+        </div>
+
+        <div className="feature-row reverse">
+          <FadeIn className="feature-visual">
+            <img src="/images/belo_nudge_phone.webp" alt="" className="feature-image nudge-image" />
+          </FadeIn>
+          <FadeIn className="feature-text" delay={0.15}>
+            <h3>Emotional Nudges</h3>
+            <p>Gentle, dismissable suggestions when the model detects the conversation shifting. Designed to help without being intrusive.</p>
+          </FadeIn>
+        </div>
+
+        <div className="feature-row">
+          <FadeIn className="feature-visual">
+            <img src="/images/belo_glance_phone.webp" alt="" className="feature-image" />
+          </FadeIn>
+          <FadeIn className="feature-text" delay={0.15}>
+            <h3>Mood at a Glance</h3>
+            <p>A visual summary on the home screen showing the emotional tone of each conversation. Mood-colored auras around each contact, visible before you open the chat.</p>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* ===== MARKET ===== */}
+      <section className="market-section">
+        <img src="/images/map_glow_outline.webp" alt="" className="section-bg market-bg-desktop" />
+        <img src="/images/vertical_map_belo_market.webp" alt="" className="section-bg market-bg-mobile" />
+        <div className="section-bg-fade" />
+
+        <div className="market-content">
+          <FadeIn>
+            <p className="section-label">The market</p>
+            <p className="big-number">80M+</p>
+            <p className="big-number-sub">
+              people across Central Asia. The youngest population in the post-Soviet world.
+              No messaging platform built for how they actually communicate.
+            </p>
+          </FadeIn>
+
+          <div className="market-stats">
+            <FadeIn>
+              <p className="market-stat-line"><span className="stat-highlight">50%+</span> of the population is under 30.</p>
+            </FadeIn>
+            <FadeIn delay={0.1}>
+              <p className="market-stat-line"><span className="stat-highlight">~27</span> median age — compared to 44 across Europe.</p>
+            </FadeIn>
+            <FadeIn delay={0.2}>
+              <p className="market-stat-line"><span className="stat-highlight">96%</span> internet penetration in Kazakhstan alone.</p>
+            </FadeIn>
+          </div>
+
+          <FadeIn>
+            <p className="market-context">
+              The infrastructure exists. The audience is online. What&apos;s missing is a product designed for them. One that understands regional communication patterns, social hierarchies, and multilingual nuance that global platforms will never optimize for.
+            </p>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* ===== TECHNOLOGY ===== */}
+      <section className="tech-section">
+        <img src="/images/tech-bg.webp" alt="" className="section-bg" />
+        <div className="section-bg-fade" />
+
+        <div className="tech-content">
+          <FadeIn>
+            <p className="section-label">Technology</p>
+            <h2 className="section-heading">Built on-device, designed to scale</h2>
+          </FadeIn>
+
+          <FadeIn>
+            <p className="section-text tech-body">
+              Sentiment analysis runs locally using micro transformer models. Mood scores, not messages, are exchanged between users via WebSocket. AI inference costs stay near zero. Message content never touches a server.
+            </p>
+          </FadeIn>
+
+          <FadeIn delay={0.1}>
+            <div className="tech-point">
+              <h3>On-Device AI</h3>
+              <p>Lightweight models process tone and context directly on the phone. Privacy is structural, not a policy.</p>
+            </div>
+          </FadeIn>
+          <FadeIn delay={0.2}>
+            <div className="tech-point">
+              <h3>Digital Twins</h3>
+              <p>Over time, each user builds a vector-based profile of their communication style. Continuously updated embeddings, not fine-tuned models.</p>
+            </div>
+          </FadeIn>
+          <FadeIn delay={0.3}>
+            <div className="tech-point">
+              <h3>Data as Embeddings</h3>
+              <p>Behavioral and emotional patterns stored as vector embeddings, never raw messages. Applications in health, marketing, education, and AI training. The product comes first.</p>
+            </div>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* ===== DATA SOVEREIGNTY ===== */}
+      <section className="sovereignty-section">
+        <img src="/images/data_dome_image.webp" alt="" className="section-bg" />
+        <div className="section-bg-fade" />
+
+        <div className="sovereignty-content">
+          <FadeIn>
+            <p className="section-label">Data sovereignty</p>
+            <h2 className="section-heading">Data generated in the region stays in the region</h2>
+            <p className="section-text">
+              Most global platforms extract user data from emerging markets and process it in foreign jurisdictions. GIOIA is building differently. Data sovereignty is a core architectural decision, not a compliance afterthought.
+            </p>
+            <p className="section-text" style={{ marginTop: '1.2em' }}>
+              Central Asian governments are investing in digital independence. Operating locally, with flexible data sovereignty frameworks, is a real structural advantage. The biggest barrier to cross-platform data use isn&apos;t technical. It&apos;s legal.
+            </p>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* ===== CLOSE — overlaid on landscape ===== */}
+      <section className="close-section">
+        <img src="/images/landscape.webp" alt="" className="close-bg" />
+        <div className="close-fade-top" />
+        <div className="close-fade-bottom" />
+
+        <FadeIn className={`close-content${formOpen ? ' shifted' : ''}`}>
+          <h2 className="close-title">GIOIA</h2>
+          <div className={`close-intro${formOpen ? ' out' : ''}`}>
+            <p className="close-text">Imagine more.</p>
+            <button className="close-cta" onClick={() => setFormOpen(true)}>Get in Touch</button>
+          </div>
+          <div className={`contact-form-wrap${formOpen ? ' visible' : ''}`}>
+            <form className="contact-form" onSubmit={(e) => { e.preventDefault(); window.location.href = `mailto:saeed@gioia.co?subject=${encodeURIComponent('Inquiry from ' + ((e.target as HTMLFormElement).fullName as HTMLInputElement).value)}&body=${encodeURIComponent(((e.target as HTMLFormElement).message as HTMLTextAreaElement).value + '\n\n— ' + ((e.target as HTMLFormElement).fullName as HTMLInputElement).value + '\n' + ((e.target as HTMLFormElement).email as HTMLInputElement).value + (((e.target as HTMLFormElement).company as HTMLInputElement).value ? '\n' + ((e.target as HTMLFormElement).company as HTMLInputElement).value : ''))}`; }}>
+              <div className="contact-fields">
+                <input type="text" name="fullName" placeholder="Name" required />
+                <input type="email" name="email" placeholder="Email" required />
+                <input type="text" name="company" placeholder="Company (optional)" />
+                <textarea name="message" placeholder="Message" rows={4} required />
+              </div>
+              <div className="contact-actions">
+                <button type="submit" className="contact-submit">Send</button>
+                <button type="button" className="contact-back" onClick={() => setFormOpen(false)}>Back</button>
+              </div>
+            </form>
+          </div>
+        </FadeIn>
+      </section>
+
+      {/* ===== FOOTER ===== */}
+      <footer className="site-footer">
+        <p>&copy; 2026 GIOIA. All rights reserved.</p>
+      </footer>
+    </main>
   );
 }
