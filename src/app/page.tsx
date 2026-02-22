@@ -352,17 +352,18 @@ export default function Home() {
             <button className="close-cta" onClick={() => setFormOpen(true)}>Get in Touch</button>
           </div>
           <div className={`contact-form-wrap${formOpen ? ' visible' : ''}`}>
-            <form className="contact-form" onSubmit={async (e) => {
+            <form className={`contact-form${formStatus === 'sent' ? ' is-sent' : ''}`} onSubmit={async (e) => {
               e.preventDefault();
               setFormStatus('sending');
               const fd = new FormData(e.target as HTMLFormElement);
-              fd.append('access_key', 'dba7d0f6-01df-4cfa-9a67-6c349e239c47');
+              fd.append('access_key', 'e9985b76-a8c1-4350-b5ba-fe91f9e45be8');
               try {
                 const res = await fetch('https://api.web3forms.com/submit', { method: 'POST', body: fd });
                 const data = await res.json();
                 if (data.success) {
                   setFormStatus('sent');
                   (e.target as HTMLFormElement).reset();
+                  setTimeout(() => { setFormOpen(false); setFormStatus('idle'); }, 1800);
                 } else {
                   setFormStatus('error');
                 }
@@ -377,11 +378,12 @@ export default function Home() {
                 <textarea name="message" placeholder="Message" rows={4} required />
               </div>
               <div className="contact-actions">
-                <button type="submit" className="contact-submit" disabled={formStatus === 'sending'}>
-                  {formStatus === 'sending' ? 'Sending...' : formStatus === 'sent' ? 'Sent' : 'Send'}
+                <button type="submit" className="contact-submit" disabled={formStatus === 'sending' || formStatus === 'sent'}>
+                  {formStatus === 'sending' ? 'Sending...' : 'Send'}
                 </button>
                 <button type="button" className="contact-back" onClick={() => { setFormOpen(false); setFormStatus('idle'); }}>Back</button>
               </div>
+              {formStatus === 'sent' && <p className="contact-success">Sent successfully.</p>}
               {formStatus === 'error' && <p className="contact-error">Something went wrong. Please try again.</p>}
             </form>
           </div>
