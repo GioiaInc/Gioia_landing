@@ -15,6 +15,13 @@ export interface DocEntry {
 
 export const docs: DocEntry[] = [
   {
+    slug: 'executive-meeting-feb-20',
+    title: 'Saeed & Roman: Vision, Strategy, Design',
+    subtitle: 'Investor debrief, Central Asia strategy, chat UI direction',
+    date: '2026-02-20',
+    category: 'Meetings',
+  },
+  {
     slug: 'executive-meeting-feb-19',
     title: 'Team Meeting: Design & Demo',
     subtitle: 'Design evolution, investor prep, Tuesday demo',
