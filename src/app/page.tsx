@@ -168,6 +168,7 @@ export default function Home() {
   const [loaded, setLoaded] = useState(false);
   const [grainOn, setGrainOn] = useState(false);
   const [lang, setLang] = useState<'en' | 'ru'>('en');
+  const [formOpen, setFormOpen] = useState(false);
   const touchStartX = useRef(0);
   const heroContentRef = useRef<HTMLDivElement>(null);
 
@@ -260,12 +261,12 @@ export default function Home() {
       <section className="features-section">
         <FadeIn>
           <p className="section-label">How it works</p>
-          <h2 className="section-heading">Three ambient features, all on-device</h2>
+          <h2 className="section-heading">Three ambient AI features, all on-device</h2>
         </FadeIn>
 
         <div className="feature-row">
           <FadeIn className="feature-visual">
-            <img src="/images/feature-mood.png" alt="" className="feature-image" />
+            <img src="/images/belo_semantic_phone.png" alt="" className="feature-image" />
           </FadeIn>
           <FadeIn className="feature-text" delay={0.15}>
             <h3>Semantic Mood Detection</h3>
@@ -275,7 +276,7 @@ export default function Home() {
 
         <div className="feature-row reverse">
           <FadeIn className="feature-visual">
-            <img src="/images/feature-nudge.png" alt="" className="feature-image" />
+            <img src="/images/belo_nudge_phone.png" alt="" className="feature-image nudge-image" />
           </FadeIn>
           <FadeIn className="feature-text" delay={0.15}>
             <h3>Emotional Nudges</h3>
@@ -285,7 +286,7 @@ export default function Home() {
 
         <div className="feature-row">
           <FadeIn className="feature-visual">
-            <img src="/images/feature-glance.png" alt="" className="feature-image" />
+            <img src="/images/belo_glance_phone.png" alt="" className="feature-image" />
           </FadeIn>
           <FadeIn className="feature-text" delay={0.15}>
             <h3>Mood Glance</h3>
@@ -296,7 +297,7 @@ export default function Home() {
 
       {/* ===== MARKET ===== */}
       <section className="market-section">
-        <img src="/images/market-bg.png" alt="" className="section-bg" />
+        <img src="/images/map_glow_outline.png" alt="" className="section-bg" />
         <div className="section-bg-fade" />
 
         <div className="market-content">
@@ -388,11 +389,28 @@ export default function Home() {
         <img src="/images/landscape.png" alt="" className="close-bg" />
         <div className="close-fade-top" />
         <div className="close-fade-bottom" />
-        <FadeIn className="close-content">
+
+        <FadeIn className={`close-content${formOpen ? ' shifted' : ''}`}>
           <h2 className="close-title">belo</h2>
-          <p className="close-byline">by GIOIA</p>
-          <p className="close-text">Built for how they actually communicate.</p>
-          <a href="mailto:saeed@gioia.co" className="close-cta">Get in Touch</a>
+          <div className={`close-intro${formOpen ? ' out' : ''}`}>
+            <p className="close-byline">by GIOIA</p>
+            <p className="close-text">Built for how they actually communicate.</p>
+            <button className="close-cta" onClick={() => setFormOpen(true)}>Get in Touch</button>
+          </div>
+          <div className={`contact-form-wrap${formOpen ? ' visible' : ''}`}>
+            <form className="contact-form" onSubmit={(e) => { e.preventDefault(); window.location.href = `mailto:saeed@gioia.co?subject=${encodeURIComponent('Inquiry from ' + ((e.target as HTMLFormElement).fullName as HTMLInputElement).value)}&body=${encodeURIComponent(((e.target as HTMLFormElement).message as HTMLTextAreaElement).value + '\n\n— ' + ((e.target as HTMLFormElement).fullName as HTMLInputElement).value + '\n' + ((e.target as HTMLFormElement).email as HTMLInputElement).value + (((e.target as HTMLFormElement).company as HTMLInputElement).value ? '\n' + ((e.target as HTMLFormElement).company as HTMLInputElement).value : ''))}`; }}>
+              <div className="contact-fields">
+                <input type="text" name="fullName" placeholder="Name" required />
+                <input type="email" name="email" placeholder="Email" required />
+                <input type="text" name="company" placeholder="Company (optional)" />
+                <textarea name="message" placeholder="Message" rows={4} required />
+              </div>
+              <div className="contact-actions">
+                <button type="submit" className="contact-submit">Send</button>
+                <button type="button" className="contact-back" onClick={() => setFormOpen(false)}>Back</button>
+              </div>
+            </form>
+          </div>
         </FadeIn>
       </section>
 
