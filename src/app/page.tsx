@@ -159,6 +159,7 @@ export default function Home() {
   const [grainOn, setGrainOn] = useState(false);
   const [lang, setLang] = useState<'en' | 'ru'>('en');
   const [formOpen, setFormOpen] = useState(false);
+  const [formStatus, setFormStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const heroContentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -351,17 +352,37 @@ export default function Home() {
             <button className="close-cta" onClick={() => setFormOpen(true)}>Get in Touch</button>
           </div>
           <div className={`contact-form-wrap${formOpen ? ' visible' : ''}`}>
-            <form className="contact-form" onSubmit={(e) => { e.preventDefault(); window.location.href = `mailto:saeed@gioia.co?subject=${encodeURIComponent('Inquiry from ' + ((e.target as HTMLFormElement).fullName as HTMLInputElement).value)}&body=${encodeURIComponent(((e.target as HTMLFormElement).message as HTMLTextAreaElement).value + '\n\n— ' + ((e.target as HTMLFormElement).fullName as HTMLInputElement).value + '\n' + ((e.target as HTMLFormElement).email as HTMLInputElement).value + (((e.target as HTMLFormElement).company as HTMLInputElement).value ? '\n' + ((e.target as HTMLFormElement).company as HTMLInputElement).value : ''))}`; }}>
+            <form className="contact-form" onSubmit={async (e) => {
+              e.preventDefault();
+              setFormStatus('sending');
+              const fd = new FormData(e.target as HTMLFormElement);
+              fd.append('access_key', 'dba7d0f6-01df-4cfa-9a67-6c349e239c47');
+              try {
+                const res = await fetch('https://api.web3forms.com/submit', { method: 'POST', body: fd });
+                const data = await res.json();
+                if (data.success) {
+                  setFormStatus('sent');
+                  (e.target as HTMLFormElement).reset();
+                } else {
+                  setFormStatus('error');
+                }
+              } catch {
+                setFormStatus('error');
+              }
+            }}>
               <div className="contact-fields">
-                <input type="text" name="fullName" placeholder="Name" required />
+                <input type="text" name="name" placeholder="Name" required />
                 <input type="email" name="email" placeholder="Email" required />
                 <input type="text" name="company" placeholder="Company (optional)" />
                 <textarea name="message" placeholder="Message" rows={4} required />
               </div>
               <div className="contact-actions">
-                <button type="submit" className="contact-submit">Send</button>
-                <button type="button" className="contact-back" onClick={() => setFormOpen(false)}>Back</button>
+                <button type="submit" className="contact-submit" disabled={formStatus === 'sending'}>
+                  {formStatus === 'sending' ? 'Sending...' : formStatus === 'sent' ? 'Sent' : 'Send'}
+                </button>
+                <button type="button" className="contact-back" onClick={() => { setFormOpen(false); setFormStatus('idle'); }}>Back</button>
               </div>
+              {formStatus === 'error' && <p className="contact-error">Something went wrong. Please try again.</p>}
             </form>
           </div>
         </FadeIn>

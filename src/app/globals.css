@@ -654,6 +654,8 @@ h1, h2, h3, p {
 .contact-form-wrap {
   display: flex;
   justify-content: center;
+  width: 90vw;
+  max-width: 720px;
   padding: 16px 0 0;
   opacity: 0;
   pointer-events: none;
@@ -672,13 +674,20 @@ h1, h2, h3, p {
 
 .contact-form {
   width: 100%;
-  max-width: 440px;
+  max-width: none;
   background: rgba(20, 20, 28, 0.55);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
   padding: 32px 36px;
+}
+
+.contact-error {
+  color: var(--error, #e05555);
+  font-size: 0.85rem;
+  text-align: center;
+  margin-top: 12px;
 }
 
 .contact-fields {
