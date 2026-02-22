@@ -1,38 +1,29 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
-const HERO_IMAGES = [
-  '/images/hero-1.png',
-  '/images/hero-2.png',
-  '/images/hero-3.png',
-  '/images/hero-4.png',
-  '/images/hero-5.png',
-  '/images/hero-6.png',
-];
 
 const SUBTITLE_EN = [
-  'Belo', 'is', 'a', 'messaging', 'platform', 'designed', 'to', 'bridge',
-  'the', 'gap', 'between', 'digital', 'communication', 'and', 'human',
-  'presence.', 'Traditional', 'messaging', 'reduces', 'conversation', 'to',
-  'basic', 'bubbles', 'on', 'a', 'screen.', 'Belo', 'integrates', 'ambient',
-  'AI', 'to', 'understand', 'tone,', 'context,', 'and', 'relational',
-  'signals,', 'allowing', 'the', 'interface', 'itself', 'to', 'respond',
-  'dynamically.', 'The', 'result', 'is', 'communication', 'that', 'feels',
-  'closer', 'to', 'real', 'presence.', 'It', 'is', 'structured,',
-  'adaptive,', 'and', 'aware', 'of', 'the', 'emotion', 'behind', 'the', 'words.',
+  '93%', 'of', 'communication', 'is', 'paralinguistic.', 'Tone,', 'timing,',
+  'pace,', 'emotion.', 'Current', 'messaging', 'captures', 'none', 'of', 'it.',
+  'belo', 'is', 'a', 'messaging', 'app', 'built', 'around', 'ambient', 'AI.',
+  'Lightweight', 'sentiment', 'models', 'process', 'everything', 'on-device,',
+  'in', 'real', 'time.', 'The', 'interface', 'reflects', 'the', 'emotional',
+  'state', 'of', 'the', 'conversation.', 'Colors', 'shift,', 'atmosphere',
+  'adapts,', 'nudges', 'appear', 'when', 'tone', 'gets', 'heated.',
+  'Nothing', 'leaves', 'the', 'phone.',
 ];
 
 const SUBTITLE_RU = [
-  'Belo', '—', 'это', 'мессенджер,', 'созданный', 'для', 'того,', 'чтобы',
-  'преодолеть', 'разрыв', 'между', 'цифровым', 'общением', 'и', 'человеческим',
-  'присутствием.', 'Традиционные', 'мессенджеры', 'сводят', 'разговор', 'к',
-  'обычным', 'пузырькам', 'на', 'экране.', 'Belo', 'использует', 'фоновый',
-  'ИИ', 'для', 'понимания', 'тона,', 'контекста', 'и', 'межличностных',
-  'сигналов,', 'позволяя', 'интерфейсу', 'динамически', 'реагировать.',
-  'Результат', '—', 'общение,', 'которое', 'ощущается', 'ближе', 'к',
-  'реальному', 'присутствию.', 'Оно', 'структурировано,', 'адаптивно',
-  'и', 'осознаёт', 'эмоции', 'за', 'словами.',
+  '93%', 'коммуникации', 'паралингвистика.', 'Тон,', 'ритм,', 'темп,',
+  'эмоция.', 'Современные', 'мессенджеры', 'не', 'передают', 'ничего',
+  'из', 'этого.', 'belo', 'это', 'мессенджер,', 'построенный', 'на',
+  'фоновом', 'ИИ.', 'Лёгкие', 'модели', 'анализа', 'тональности',
+  'работают', 'на', 'устройстве,', 'в', 'реальном', 'времени.',
+  'Интерфейс', 'отражает', 'эмоциональное', 'состояние', 'разговора.',
+  'Цвета', 'меняются,', 'атмосфера', 'адаптируется,', 'подсказки',
+  'появляются,', 'когда', 'тон', 'обостряется.',
+  'Ничего', 'не', 'покидает', 'телефон.',
 ];
 
 function FilmGrain() {
@@ -164,17 +155,11 @@ function ImageBreak({ src, alt = '' }: { src: string; alt?: string }) {
 }
 
 export default function Home() {
-  const [heroIndex, setHeroIndex] = useState(0);
   const [loaded, setLoaded] = useState(false);
   const [grainOn, setGrainOn] = useState(false);
   const [lang, setLang] = useState<'en' | 'ru'>('en');
   const [formOpen, setFormOpen] = useState(false);
-  const touchStartX = useRef(0);
   const heroContentRef = useRef<HTMLDivElement>(null);
-
-  const cycleHero = useCallback((direction: 1 | -1) => {
-    setHeroIndex((prev) => (prev + direction + HERO_IMAGES.length) % HERO_IMAGES.length);
-  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => setLoaded(true), 100);
@@ -194,48 +179,13 @@ export default function Home() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight') cycleHero(1);
-      if (e.key === 'ArrowLeft') cycleHero(-1);
-    };
-    window.addEventListener('keydown', handleKey);
-    return () => window.removeEventListener('keydown', handleKey);
-  }, [cycleHero]);
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    const diff = touchStartX.current - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 50) {
-      cycleHero(diff > 0 ? 1 : -1);
-    }
-  };
-
   return (
     <main>
       {/* ===== HERO ===== */}
-      <section
-        className="hero"
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-      >
+      <section className="hero">
         <div className="hero-image-wrap">
-          {HERO_IMAGES.map((src, i) => (
-            <img
-              key={src}
-              src={src}
-              alt="belo hero"
-              className={`hero-image ${i === heroIndex ? 'active' : ''}`}
-            />
-          ))}
-          <img
-            src="/images/hero-mobile.png"
-            alt="belo hero"
-            className={`hero-image hero-mobile-only ${heroIndex === 0 ? 'active' : ''}`}
-          />
+          <img src="/images/hero-1.webp" alt="belo hero" className="hero-image active" />
+          <img src="/images/hero-mobile.webp" alt="belo hero" className="hero-image hero-mobile-only active" />
         </div>
 
         {grainOn && <FilmGrain />}
@@ -266,30 +216,30 @@ export default function Home() {
 
         <div className="feature-row">
           <FadeIn className="feature-visual">
-            <img src="/images/belo_semantic_phone.png" alt="" className="feature-image" />
+            <img src="/images/belo_semantic_phone.webp" alt="" className="feature-image" />
           </FadeIn>
           <FadeIn className="feature-text" delay={0.15}>
             <h3>Semantic Mood Detection</h3>
-            <p>Real-time sentiment analysis changes the visual atmosphere of a chat — colors, effects, background — based on the averaged emotional state of both people in the conversation.</p>
+            <p>Real-time sentiment analysis changes the visual atmosphere of a chat. Colors, effects, and background shift based on the emotional state of both people in the conversation.</p>
           </FadeIn>
         </div>
 
         <div className="feature-row reverse">
           <FadeIn className="feature-visual">
-            <img src="/images/belo_nudge_phone.png" alt="" className="feature-image nudge-image" />
+            <img src="/images/belo_nudge_phone.webp" alt="" className="feature-image nudge-image" />
           </FadeIn>
           <FadeIn className="feature-text" delay={0.15}>
             <h3>Emotional Nudges</h3>
-            <p>Gentle, dismissable suggestions when the model detects the conversation shifting. Designed to help without being intrusive — easy to turn off entirely.</p>
+            <p>Gentle, dismissable suggestions when the model detects the conversation shifting. Designed to help without being intrusive.</p>
           </FadeIn>
         </div>
 
         <div className="feature-row">
           <FadeIn className="feature-visual">
-            <img src="/images/belo_glance_phone.png" alt="" className="feature-image" />
+            <img src="/images/belo_glance_phone.webp" alt="" className="feature-image" />
           </FadeIn>
           <FadeIn className="feature-text" delay={0.15}>
-            <h3>Mood Glance</h3>
+            <h3>Mood at a Glance</h3>
             <p>A visual summary on the home screen showing the emotional tone of each conversation. Mood-colored auras around each contact, visible before you open the chat.</p>
           </FadeIn>
         </div>
@@ -297,7 +247,8 @@ export default function Home() {
 
       {/* ===== MARKET ===== */}
       <section className="market-section">
-        <img src="/images/map_glow_outline.png" alt="" className="section-bg" />
+        <img src="/images/map_glow_outline.webp" alt="" className="section-bg market-bg-desktop" />
+        <img src="/images/vertical_map_belo_market.webp" alt="" className="section-bg market-bg-mobile" />
         <div className="section-bg-fade" />
 
         <div className="market-content">
@@ -324,7 +275,7 @@ export default function Home() {
 
           <FadeIn>
             <p className="market-context">
-              The infrastructure exists. The audience is online. What&apos;s missing is a product designed for them — one that understands regional communication patterns, social hierarchies, and multilingual nuance that global platforms will never optimize for.
+              The infrastructure exists. The audience is online. What&apos;s missing is a product designed for them. One that understands regional communication patterns, social hierarchies, and multilingual nuance that global platforms will never optimize for.
             </p>
           </FadeIn>
         </div>
@@ -332,7 +283,7 @@ export default function Home() {
 
       {/* ===== TECHNOLOGY ===== */}
       <section className="tech-section">
-        <img src="/images/tech-bg.png" alt="" className="section-bg" />
+        <img src="/images/tech-bg.webp" alt="" className="section-bg" />
         <div className="section-bg-fade" />
 
         <div className="tech-content">
@@ -343,7 +294,7 @@ export default function Home() {
 
           <FadeIn>
             <p className="section-text tech-body">
-              Sentiment analysis runs locally using micro transformer models. Mood scores — not messages — are exchanged between users via WebSocket. AI inference costs stay near zero. Message content never touches a server.
+              Sentiment analysis runs locally using micro transformer models. Mood scores, not messages, are exchanged between users via WebSocket. AI inference costs stay near zero. Message content never touches a server.
             </p>
           </FadeIn>
 
@@ -356,13 +307,13 @@ export default function Home() {
           <FadeIn delay={0.2}>
             <div className="tech-point">
               <h3>Digital Twins</h3>
-              <p>Over time, each user builds a vector-based profile of their communication style — continuously updated embeddings, not fine-tuned models.</p>
+              <p>Over time, each user builds a vector-based profile of their communication style. Continuously updated embeddings, not fine-tuned models.</p>
             </div>
           </FadeIn>
           <FadeIn delay={0.3}>
             <div className="tech-point">
               <h3>Data as Embeddings</h3>
-              <p>User data stored as vector embeddings, not baked into models. Flexible, portable, and licensable with proper anonymization.</p>
+              <p>Behavioral and emotional patterns stored as vector embeddings, never raw messages. Applications in health, marketing, education, and AI training. The product comes first.</p>
             </div>
           </FadeIn>
         </div>
@@ -370,15 +321,18 @@ export default function Home() {
 
       {/* ===== DATA SOVEREIGNTY ===== */}
       <section className="sovereignty-section">
-        <img src="/images/sovereignty-bg.png" alt="" className="section-bg" />
+        <img src="/images/data_dome_image.webp" alt="" className="section-bg" />
         <div className="section-bg-fade" />
 
         <div className="sovereignty-content">
           <FadeIn>
             <p className="section-label">Data sovereignty</p>
-            <h2 className="section-heading">What&apos;s generated here stays here</h2>
+            <h2 className="section-heading">Data generated in the region stays in the region</h2>
             <p className="section-text">
-              Most global platforms extract user data from emerging markets and process it in foreign jurisdictions. Belo is built differently — data sovereignty is a core architectural decision. Local infrastructure, privacy by default, regulatory alignment, and value that stays in the region.
+              Most global platforms extract user data from emerging markets and process it in foreign jurisdictions. GIOIA is building differently. Data sovereignty is a core architectural decision, not a compliance afterthought.
+            </p>
+            <p className="section-text" style={{ marginTop: '1.2em' }}>
+              Central Asian governments are investing in digital independence. Operating locally, with flexible data sovereignty frameworks, is a real structural advantage. The biggest barrier to cross-platform data use isn&apos;t technical. It&apos;s legal.
             </p>
           </FadeIn>
         </div>
@@ -386,15 +340,14 @@ export default function Home() {
 
       {/* ===== CLOSE — overlaid on landscape ===== */}
       <section className="close-section">
-        <img src="/images/landscape.png" alt="" className="close-bg" />
+        <img src="/images/landscape.webp" alt="" className="close-bg" />
         <div className="close-fade-top" />
         <div className="close-fade-bottom" />
 
         <FadeIn className={`close-content${formOpen ? ' shifted' : ''}`}>
-          <h2 className="close-title">belo</h2>
+          <h2 className="close-title">GIOIA</h2>
           <div className={`close-intro${formOpen ? ' out' : ''}`}>
-            <p className="close-byline">by GIOIA</p>
-            <p className="close-text">Built for how they actually communicate.</p>
+            <p className="close-text">Imagine more.</p>
             <button className="close-cta" onClick={() => setFormOpen(true)}>Get in Touch</button>
           </div>
           <div className={`contact-form-wrap${formOpen ? ' visible' : ''}`}>

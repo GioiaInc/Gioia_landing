@@ -23,6 +23,11 @@ body {
   background: #0a0a0c;
   overflow-x: hidden;
   margin: 0;
+  text-wrap: pretty;
+}
+
+h1, h2, h3, p {
+  text-wrap: balance;
 }
 
 /* ============================================
@@ -292,6 +297,8 @@ body {
   height: auto;
   border-radius: 0;
   opacity: 0.75;
+  display: block;
+  margin: 0 auto;
   mask-image: radial-gradient(ellipse 65% 65% at center, black 20%, transparent 75%);
   -webkit-mask-image: radial-gradient(ellipse 65% 65% at center, black 20%, transparent 75%);
 }
@@ -358,6 +365,10 @@ body {
 
 .market-section .section-bg {
   opacity: 0.45;
+}
+
+.market-bg-mobile {
+  display: none;
 }
 
 .market-section .section-bg-fade {
@@ -488,6 +499,10 @@ body {
   text-align: center;
   position: relative;
   overflow: hidden;
+}
+
+.sovereignty-section .section-bg {
+  opacity: 0.45;
 }
 
 .sovereignty-content {
@@ -812,7 +827,7 @@ body {
   }
 
   .word-reveal-text {
-    font-size: 1.1rem;
+    font-size: 1.25rem;
     line-height: 1.8;
   }
 
@@ -854,6 +869,14 @@ body {
     padding: 80px 24px;
   }
 
+  .market-bg-desktop {
+    display: none;
+  }
+
+  .market-bg-mobile {
+    display: block;
+  }
+
   .big-number-sub {
     margin-bottom: 48px;
   }
@@ -872,5 +895,10 @@ body {
 
   .close-section {
     min-height: 60vh;
+  }
+
+  .close-fade-top {
+    height: 60%;
+    background: linear-gradient(to bottom, #0a0a0c 25%, transparent);
   }
 }
