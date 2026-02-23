@@ -5,6 +5,7 @@ import ExecutiveMeetingFeb15 from './executive-meeting-feb-15';
 import ExecutiveMeetingFeb17 from './executive-meeting-feb-17';
 import ExecutiveMeetingFeb19 from './executive-meeting-feb-19';
 import ExecutiveMeetingFeb20 from './executive-meeting-feb-20';
+import ExecutiveMeetingFeb23 from './executive-meeting-feb-23';
 
 // ============================================
 // REGISTER DOC CONTENT HERE
@@ -13,6 +14,7 @@ import ExecutiveMeetingFeb20 from './executive-meeting-feb-20';
 // ============================================
 
 export const docsContent: Record<string, ComponentType> = {
+  'executive-meeting-feb-23': ExecutiveMeetingFeb23,
   'test-document': TestDocument,
   'balo-ambient-ai-plan': BaloAmbientAIPlan,
   'executive-meeting-feb-15': ExecutiveMeetingFeb15,
