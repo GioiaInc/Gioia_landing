@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { docs } from '@/lib/docs-config';
+import QuoteColumns from './QuoteColumns';
 
 export default function DocsHub() {
   // Sort by date descending (newest first)
@@ -42,35 +43,38 @@ export default function DocsHub() {
         </div>
       </nav>
 
-      <div className="docs-hub-list">
-        <h1 className="docs-hub-title">Documents</h1>
+      <div className="docs-hub-with-quotes">
+        <QuoteColumns />
+        <div className="docs-hub-list">
+          <h1 className="docs-hub-title">Documents</h1>
 
-        {Object.entries(grouped).map(([month, entries]) => (
-          <div key={month} className="docs-month-group">
-            <p className="docs-month-label">{month}</p>
+          {Object.entries(grouped).map(([month, entries]) => (
+            <div key={month} className="docs-month-group">
+              <p className="docs-month-label">{month}</p>
 
-            <div className="docs-entries">
-              {entries.map((doc) => (
-                <Link
-                  key={doc.slug}
-                  href={`/docs/${doc.slug}`}
-                  className="docs-entry"
-                >
-                  <div className="docs-entry-date">{formatDay(doc.date)}</div>
-                  <div className="docs-entry-body">
-                    <span className="docs-entry-title">{doc.title}</span>
-                    {doc.subtitle && (
-                      <span className="docs-entry-sub">{doc.subtitle}</span>
+              <div className="docs-entries">
+                {entries.map((doc) => (
+                  <Link
+                    key={doc.slug}
+                    href={`/docs/${doc.slug}`}
+                    className="docs-entry"
+                  >
+                    <div className="docs-entry-date">{formatDay(doc.date)}</div>
+                    <div className="docs-entry-body">
+                      <span className="docs-entry-title">{doc.title}</span>
+                      {doc.subtitle && (
+                        <span className="docs-entry-sub">{doc.subtitle}</span>
+                      )}
+                    </div>
+                    {doc.category && (
+                      <span className="docs-entry-cat">{doc.category}</span>
                     )}
-                  </div>
-                  {doc.category && (
-                    <span className="docs-entry-cat">{doc.category}</span>
-                  )}
-                </Link>
-              ))}
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       <footer className="docs-footer">

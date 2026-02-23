@@ -522,6 +522,94 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
           0%, 100% { opacity: 0.3; transform: scale(1); }
           50% { opacity: 1; transform: scale(1.5); }
         }
+
+        /* --- Scrolling Quote Columns --- */
+        .docs-hub-with-quotes {
+          position: relative;
+          overflow: hidden;
+        }
+        .quote-col {
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          width: 220px;
+          pointer-events: none;
+          overflow: hidden;
+          z-index: 0;
+        }
+        .quote-col-left {
+          right: calc(50% + 340px);
+        }
+        .quote-col-right {
+          left: calc(50% + 340px);
+        }
+        .quote-col::before,
+        .quote-col::after {
+          content: '';
+          position: absolute;
+          left: 0;
+          right: 0;
+          height: 120px;
+          z-index: 1;
+          pointer-events: none;
+        }
+        .quote-col::before {
+          top: 0;
+          background: linear-gradient(to bottom, #faf9f6, transparent);
+        }
+        .quote-col::after {
+          bottom: 0;
+          background: linear-gradient(to top, #faf9f6, transparent);
+        }
+        .quote-col-track {
+          display: flex;
+          flex-direction: column;
+          gap: 2rem;
+          will-change: transform;
+        }
+        .quote-col-track-left {
+          animation: quote-scroll-up 35s linear infinite;
+        }
+        .quote-col-track-right {
+          animation: quote-scroll-up 45s linear infinite;
+        }
+        @keyframes quote-scroll-up {
+          0% { transform: translateY(0); }
+          100% { transform: translateY(-50%); }
+        }
+        .quote-col-item {
+          margin: 0;
+          padding: 0;
+        }
+        .quote-col-text {
+          font-family: 'Cormorant Garamond', Georgia, serif;
+          font-size: 0.95rem;
+          font-style: italic;
+          line-height: 1.5;
+          color: #1a1a1a;
+          opacity: 0.12;
+          margin: 0 0 0.25rem;
+        }
+        .quote-col-author {
+          font-family: 'Montserrat', sans-serif;
+          font-size: 0.55rem;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: #1a1a1a;
+          opacity: 0.10;
+          margin: 0;
+        }
+        @media (max-width: 1100px) {
+          .quote-col {
+            display: none;
+          }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .quote-col-track-left,
+          .quote-col-track-right {
+            animation: none;
+          }
+        }
       `}</style>
     </div>
   );
