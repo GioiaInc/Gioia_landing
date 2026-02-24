@@ -48,4 +48,17 @@ export const docsQuotes: DocsQuote[] = [
     text: "Let's just build it, bro. Let's do it. My mind is 100% on this right now — community is how you make an app go viral.",
     author: "Saeed",
   },
+  // Feb 24
+  {
+    text: "I think we're building something really noble here with this app… we have such a bigger reason to actually build this app now. And it goes far beyond just us.",
+    author: "Saeed",
+  },
+  {
+    text: "It's kind of crazy with AI. We've been able to develop the backend at the same pace as design, if not a little bit faster sometimes, which is definitely like flipping the script.",
+    author: "Roman",
+  },
+  {
+    text: "Being lonely is super easy these days because you can just sit online and doom scroll… but if we create something where you're on your phone but it's actually productive and you can actually feel someone's emotion — that's different.",
+    author: "Saeed",
+  },
 ];
