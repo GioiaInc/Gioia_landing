@@ -7,6 +7,7 @@ import ExecutiveMeetingFeb19 from './executive-meeting-feb-19';
 import ExecutiveMeetingFeb20 from './executive-meeting-feb-20';
 import ExecutiveMeetingFeb23 from './executive-meeting-feb-23';
 import TeamMeetingFeb24 from './team-meeting-feb-24';
+import TeamMeetingFeb26 from './team-meeting-feb-26';
 
 // ============================================
 // REGISTER DOC CONTENT HERE
@@ -15,6 +16,7 @@ import TeamMeetingFeb24 from './team-meeting-feb-24';
 // ============================================
 
 export const docsContent: Record<string, ComponentType> = {
+  'team-meeting-feb-26': TeamMeetingFeb26,
   'team-meeting-feb-24': TeamMeetingFeb24,
   'executive-meeting-feb-23': ExecutiveMeetingFeb23,
   'test-document': TestDocument,

@@ -61,4 +61,17 @@ export const docsQuotes: DocsQuote[] = [
     text: "Being lonely is super easy these days because you can just sit online and doom scroll… but if we create something where you're on your phone but it's actually productive and you can actually feel someone's emotion — that's different.",
     author: "Saeed",
   },
+  // Feb 26
+  {
+    text: "The biggest restaurant chain is not a salad chain, it's McDonald's. People don't like healthy things — you have to have something in there that is more fun that people will actually download.",
+    author: "Saeed",
+  },
+  {
+    text: "I now have it fully hands-off… I added hot mic support, so now I can just talk directly into my computer and it knows which project to go into and send the command. It's making me about 15% faster, and we'll go even faster than we have been.",
+    author: "Roman",
+  },
+  {
+    text: "When you call someone, even in Discord, you join the chat and then you wait for others — it's a little bit official. But what if you could just click, hold, join into the video for a quick second, and then when you let go, it collapses? Just both joined on a quick circle — no recollection of it.",
+    author: "Saeed",
+  },
 ];
