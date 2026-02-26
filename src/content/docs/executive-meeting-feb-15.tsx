@@ -55,7 +55,7 @@ export default function ExecutiveMeetingFeb15() {
       <p>
         All three run entirely on-device using micro transformers. Scores (not
         messages) are exchanged via WebSocket. Visual implementation pending
-        design review with Enes.
+        design review with Enis.
       </p>
 
       <h2>Central Asia Market Insights</h2>
@@ -171,7 +171,7 @@ export default function ExecutiveMeetingFeb15() {
           data strategy.
         </li>
         <li>
-          <strong>Enes:</strong> Design review for mood-responsive visual
+          <strong>Enis:</strong> Design review for mood-responsive visual
           system — how sentiment scores translate to UI (backgrounds, bubbles,
           animations, particle effects).
         </li>

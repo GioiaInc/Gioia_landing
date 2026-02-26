@@ -2,7 +2,7 @@ export default function TeamMeetingFeb24() {
   return (
     <>
       <p>
-        Full team meeting — Saeed, Roman, Enes, and Kambad. Covered team
+        Full team meeting — Saeed, Roman, Enis, and Kambar. Covered team
         communication expectations, onboarding UX, home screen design debates,
         the new Bello Communities initiative, emotional AI&apos;s social impact
         mission, and Apple App Store submission prep ahead of the March 31
@@ -19,7 +19,7 @@ export default function TeamMeetingFeb24() {
 
       <h2>Onboarding &amp; Welcome Screens</h2>
       <p>
-        Enes presented Figma designs for the onboarding flow: get-started
+        Enis presented Figma designs for the onboarding flow: get-started
         screen, account creation (first name, last name, phone number, optional
         email), SMS verification, and profile photo upload. The team debated
         requiring a photo upfront vs. allowing a grace period. Saeed pushed for
@@ -33,14 +33,14 @@ export default function TeamMeetingFeb24() {
         &quot;all contacts&quot; view accessible by scrolling up. A lively
         debate broke out over alphabetical contact sorting — Roman argued
         nobody scrolls to the letter &quot;F&quot; anymore, they just search.
-        Enes noted older demographics still use alphabetical lists. The team
+        Enis noted older demographics still use alphabetical lists. The team
         agreed search should be the primary pattern, with sorting revisited
         later.
       </p>
 
       <h2>Apple Liquid Glass &amp; Design Identity</h2>
       <p>
-        Enes asked about replicating Apple&apos;s liquid glass UI. Roman
+        Enis asked about replicating Apple&apos;s liquid glass UI. Roman
         explained it requires Apple&apos;s proprietary Metal/Swift stack —
         impossible in Flutter without tripling the work. Saeed said he
         doesn&apos;t want to copy Apple anyway; Bello should have its own
@@ -70,7 +70,7 @@ export default function TeamMeetingFeb24() {
         moral imperative and a compelling distribution story for schools.
       </p>
 
-      <h2>Kambad&apos;s Strategy Update</h2>
+      <h2>Kambar&apos;s Strategy Update</h2>
       <p>
         Four workstreams: (1) competitive comparison chart — Bello vs. Discord,
         WhatsApp, WeChat, VK, Instagram; (2) distribution strategy for first
@@ -92,16 +92,16 @@ export default function TeamMeetingFeb24() {
 
       <h2>Speech-to-Text &amp; Language Support</h2>
       <p>
-        Enes proposed speech-to-text that converts voice to text messages for
+        Enis proposed speech-to-text that converts voice to text messages for
         users who can&apos;t type. This raised the language gap — Albanian,
         Kazakh, and Tajik have poor or nonexistent speech recognition on
-        existing platforms. Kambad noted Nazarbayev University trains Kazakh
+        existing platforms. Kambar noted Nazarbayev University trains Kazakh
         language models. Roman is confident hosted models can be found.
       </p>
 
       <h2>GIFs, Stickers &amp; Expression</h2>
       <p>
-        Kambad advocated for GIF and sticker support — in Central Asian group
+        Kambar advocated for GIF and sticker support — in Central Asian group
         chat culture, people send a GIF that says &quot;hi&quot; instead of
         typing it. The team agreed to add them, including custom user-uploaded
         stickers similar to WeChat.

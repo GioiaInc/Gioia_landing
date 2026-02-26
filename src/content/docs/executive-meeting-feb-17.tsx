@@ -2,7 +2,7 @@ export default function ExecutiveMeetingFeb17() {
   return (
     <>
       <p>
-        Full team meeting — Saeed, Roman, Kambar, and Enes. This was the longest
+        Full team meeting — Saeed, Roman, Kambar, and Enis. This was the longest
         and most substantive session to date, covering product status, server
         infrastructure, AI strategy, company vision, design direction, and the
         March 31 public launch deadline.
@@ -198,12 +198,12 @@ export default function ExecutiveMeetingFeb17() {
       <h2>Design Direction</h2>
       <ul>
         <li>
-          <strong>Main page design locked in.</strong> Enes&apos; latest design
+          <strong>Main page design locked in.</strong> Enis&apos; latest design
           approved by Saeed — different colors representing different emotions.
           No changes before March 31; any iterations happen after launch.
         </li>
         <li>
-          <strong>Emotional visual design system</strong> — Enes to define how
+          <strong>Emotional visual design system</strong> — Enis to define how
           mood translates to UI (messaging backgrounds, bubble colors,
           animations). <strong>Deadline: March 15.</strong>
         </li>
@@ -213,7 +213,7 @@ export default function ExecutiveMeetingFeb17() {
         </li>
         <li>
           <strong>Saeed taking over branding/marketing design</strong> — logos,
-          color portal, marketing materials. Frees Enes to help Roman with
+          color portal, marketing materials. Frees Enis to help Roman with
           frontend implementation.
         </li>
         <li>
@@ -222,7 +222,7 @@ export default function ExecutiveMeetingFeb17() {
           per project).
         </li>
         <li>
-          <strong>Enes presenting design journey Thursday</strong> — full
+          <strong>Enis presenting design journey Thursday</strong> — full
           walkthrough of design evolution from start to current.
         </li>
         <li>
@@ -255,7 +255,7 @@ export default function ExecutiveMeetingFeb17() {
           finance).
         </li>
         <li>
-          Kosovo networking: Enes had a call with a contact — setting up future
+          Kosovo networking: Enis had a call with a contact — setting up future
           GIOIA introduction. Also exploring Kosovo-origin VCs in the US.
         </li>
       </ul>
@@ -268,7 +268,7 @@ export default function ExecutiveMeetingFeb17() {
       <ul>
         <li>Fully working app with emotional AI features</li>
         <li>Design system implemented</li>
-        <li>App Store and Play Store listings (Enes researching requirements)</li>
+        <li>App Store and Play Store listings (Enis researching requirements)</li>
         <li>Bug-free core experience (team stress-testing now)</li>
       </ul>
 
@@ -290,7 +290,7 @@ export default function ExecutiveMeetingFeb17() {
           Continue server &amp; AI research.
         </li>
         <li>
-          <strong>Enes:</strong> Emotional visual design system by March 15.
+          <strong>Enis:</strong> Emotional visual design system by March 15.
           Research App Store / Play Store submission requirements. Design
           journey presentation Thursday. Help Roman with frontend
           implementation.

@@ -70,7 +70,7 @@ export default function BaloAmbientAIPlan() {
       </p>
       <p>
         Exact visual implementation (background gradients, bubble effects,
-        particle animations) to be determined with Enes in the next team design
+        particle animations) to be determined with Enis in the next team design
         review.
       </p>
 
@@ -156,7 +156,7 @@ export default function BaloAmbientAIPlan() {
           score exchange for the April release.
         </li>
         <li>
-          Team design review with Enes to determine visual expression of mood
+          Team design review with Enis to determine visual expression of mood
           states (backgrounds, bubbles, effects).
         </li>
         <li>

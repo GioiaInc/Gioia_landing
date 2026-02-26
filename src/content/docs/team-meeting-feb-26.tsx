@@ -2,7 +2,7 @@ export default function TeamMeetingFeb26() {
   return (
     <>
       <p>
-        Full team meeting — Saeed, Roman, Enes, and Kambad. Covered landing page
+        Full team meeting — Saeed, Roman, Enis, and Kambar. Covered landing page
         polish and Russian translation, GIF stress testing and bugs, development
         velocity with AI tooling, the &quot;quick circle&quot; informal video
         feature, killer feature brainstorming, bots vs. integrated AI, and the
@@ -30,7 +30,7 @@ export default function TeamMeetingFeb26() {
 
       <h2>Presence &amp; Avatar Design</h2>
       <p>
-        Enes proposed a presence concept: avatars that grow or pulse when both
+        Enis proposed a presence concept: avatars that grow or pulse when both
         users are actively in the same chat, creating a sense of shared space.
         The team liked the idea but flagged the BeReal problem — features that
         create social obligation can backfire. The balance between presence and
@@ -61,7 +61,7 @@ export default function TeamMeetingFeb26() {
 
       <h2>Bots vs. Integrated AI</h2>
       <p>
-        Kambad presented competitor research on bot ecosystems across Discord,
+        Kambar presented competitor research on bot ecosystems across Discord,
         Telegram, and WhatsApp. Saeed firmly rejected bots for launch —
         everything bots do should be handled by Bello&apos;s integrated AI
         seamlessly, without users needing to add or manage separate bot
@@ -79,7 +79,7 @@ export default function TeamMeetingFeb26() {
         Roman&apos;s priority order: (1) AI features, (2) quick circle video,
         (3) quality-of-life bug fixes, (4) design implementation. Saeed will
         create a tiered feature list — must-have, important, and nice-to-have
-        — for the March 31 deadline. Enes needs to deliver all remaining
+        — for the March 31 deadline. Enis needs to deliver all remaining
         detailed designs (menu, settings, gesture flows) ASAP so Roman can
         build them out. The team acknowledged the gap between vision and
         implementation and committed to moving faster.
