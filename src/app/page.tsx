@@ -1,30 +1,9 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import { tr, subtitleWords, revenueAdMarketParts } from '@/lib/translations';
+import { useLanguage } from '@/lib/useLanguage';
 
-
-const SUBTITLE_EN = [
-  '93%', 'of', 'communication', 'is', 'paralinguistic.', 'Tone,', 'timing,',
-  'pace,', 'emotion.', 'Current', 'messaging', 'captures', 'none', 'of', 'it.',
-  'belo', 'is', 'a', 'messaging', 'app', 'built', 'around', 'ambient', 'AI.',
-  'Lightweight', 'sentiment', 'models', 'process', 'everything', 'on-device,',
-  'in', 'real', 'time.', 'The', 'interface', 'reflects', 'the', 'emotional',
-  'state', 'of', 'the', 'conversation.', 'Colors', 'shift,', 'atmosphere',
-  'adapts,', 'nudges', 'appear', 'when', 'tone', 'gets', 'heated.',
-  'Nothing', 'leaves', 'the', 'phone.',
-];
-
-const SUBTITLE_RU = [
-  '93%', 'коммуникации', 'паралингвистика.', 'Тон,', 'ритм,', 'темп,',
-  'эмоция.', 'Современные', 'мессенджеры', 'не', 'передают', 'ничего',
-  'из', 'этого.', 'belo', 'это', 'мессенджер,', 'построенный', 'на',
-  'фоновом', 'ИИ.', 'Лёгкие', 'модели', 'анализа', 'тональности',
-  'работают', 'на', 'устройстве,', 'в', 'реальном', 'времени.',
-  'Интерфейс', 'отражает', 'эмоциональное', 'состояние', 'разговора.',
-  'Цвета', 'меняются,', 'атмосфера', 'адаптируется,', 'подсказки',
-  'появляются,', 'когда', 'тон', 'обостряется.',
-  'Ничего', 'не', 'покидает', 'телефон.',
-];
 
 function FilmGrain() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -157,7 +136,7 @@ function ImageBreak({ src, alt = '' }: { src: string; alt?: string }) {
 export default function Home() {
   const [loaded, setLoaded] = useState(false);
   const [grainOn, setGrainOn] = useState(false);
-  const [lang, setLang] = useState<'en' | 'ru'>('en');
+  const { lang, toggleLang } = useLanguage();
   const [formOpen, setFormOpen] = useState(false);
   const [formStatus, setFormStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const heroContentRef = useRef<HTMLDivElement>(null);
@@ -180,8 +159,15 @@ export default function Home() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  const adParts = revenueAdMarketParts[lang];
+
   return (
     <main>
+      {/* ===== LANGUAGE TOGGLE ===== */}
+      <button className="lang-toggle" onClick={toggleLang} aria-label="Switch language">
+        {lang === 'en' ? 'RU' : 'EN'}
+      </button>
+
       {/* ===== HERO ===== */}
       <section className="hero">
         <div className="hero-image-wrap">
@@ -195,7 +181,7 @@ export default function Home() {
 
         <div ref={heroContentRef} className={`hero-content ${loaded ? 'visible' : ''}`}>
           <h1 className="hero-title">belo</h1>
-          <p className="hero-byline">by GIOIA</p>
+          <p className="hero-byline">{tr('hero.byline', lang)}</p>
         </div>
 
         <div className="scroll-hint">
@@ -205,14 +191,14 @@ export default function Home() {
 
       {/* ===== SUBTITLE / INTRO ===== */}
       <section className="intro-section">
-        <WordReveal key={lang} words={lang === 'en' ? SUBTITLE_EN : SUBTITLE_RU} />
+        <WordReveal key={lang} words={subtitleWords[lang]} />
       </section>
 
       {/* ===== HOW IT WORKS ===== */}
       <section className="features-section">
         <FadeIn>
-          <p className="section-label">How it works</p>
-          <h2 className="section-heading">Three ambient AI features, all on-device</h2>
+          <p className="section-label">{tr('features.label', lang)}</p>
+          <h2 className="section-heading">{tr('features.heading', lang)}</h2>
         </FadeIn>
 
         <div className="feature-row">
@@ -220,8 +206,8 @@ export default function Home() {
             <img src="/images/belo_semantic_phone.webp" alt="" className="feature-image" />
           </FadeIn>
           <FadeIn className="feature-text" delay={0.15}>
-            <h3>Semantic Mood Detection</h3>
-            <p>Real-time sentiment analysis changes the visual atmosphere of a chat. Colors, effects, and background shift based on the emotional state of both people in the conversation.</p>
+            <h3>{tr('features.semantic.title', lang)}</h3>
+            <p>{tr('features.semantic.desc', lang)}</p>
           </FadeIn>
         </div>
 
@@ -230,8 +216,8 @@ export default function Home() {
             <img src="/images/belo_nudge_phone.webp" alt="" className="feature-image nudge-image" />
           </FadeIn>
           <FadeIn className="feature-text" delay={0.15}>
-            <h3>Emotional Nudges</h3>
-            <p>Gentle, dismissable suggestions when the model detects the conversation shifting. Designed to help without being intrusive.</p>
+            <h3>{tr('features.nudges.title', lang)}</h3>
+            <p>{tr('features.nudges.desc', lang)}</p>
           </FadeIn>
         </div>
 
@@ -240,8 +226,8 @@ export default function Home() {
             <img src="/images/belo_glance_phone.webp" alt="" className="feature-image" />
           </FadeIn>
           <FadeIn className="feature-text" delay={0.15}>
-            <h3>Mood at a Glance</h3>
-            <p>A visual summary on the home screen showing the emotional tone of each conversation. Mood-colored auras around each contact, visible before you open the chat.</p>
+            <h3>{tr('features.glance.title', lang)}</h3>
+            <p>{tr('features.glance.desc', lang)}</p>
           </FadeIn>
         </div>
       </section>
@@ -254,29 +240,28 @@ export default function Home() {
 
         <div className="market-content">
           <FadeIn>
-            <p className="section-label">The market</p>
+            <p className="section-label">{tr('market.label', lang)}</p>
             <p className="big-number">80M+</p>
             <p className="big-number-sub">
-              people across Central Asia. The youngest population in the post-Soviet world.
-              No messaging platform built for how they actually communicate.
+              {tr('market.sub', lang)}
             </p>
           </FadeIn>
 
           <div className="market-stats">
             <FadeIn>
-              <p className="market-stat-line"><span className="stat-highlight">50%+</span> of the population is under 30.</p>
+              <p className="market-stat-line"><span className="stat-highlight">{tr('market.stat1.value', lang)}</span>{tr('market.stat1.text', lang)}</p>
             </FadeIn>
             <FadeIn delay={0.1}>
-              <p className="market-stat-line"><span className="stat-highlight">~27</span> median age — compared to 44 across Europe.</p>
+              <p className="market-stat-line"><span className="stat-highlight">{tr('market.stat2.value', lang)}</span>{tr('market.stat2.text', lang)}</p>
             </FadeIn>
             <FadeIn delay={0.2}>
-              <p className="market-stat-line"><span className="stat-highlight">96%</span> internet penetration in Kazakhstan alone.</p>
+              <p className="market-stat-line"><span className="stat-highlight">{tr('market.stat3.value', lang)}</span>{tr('market.stat3.text', lang)}</p>
             </FadeIn>
           </div>
 
           <FadeIn>
             <p className="market-context">
-              The infrastructure exists. The audience is online. What&apos;s missing is a product designed for them. One that understands regional communication patterns, social hierarchies, and multilingual nuance that global platforms will never optimize for.
+              {tr('market.context', lang)}
             </p>
           </FadeIn>
         </div>
@@ -287,34 +272,34 @@ export default function Home() {
 
         <div className="revenue-content">
           <FadeIn>
-            <p className="section-label">Business model</p>
-            <h2 className="section-heading">The product is free. The business is in what it enables.</h2>
+            <p className="section-label">{tr('revenue.label', lang)}</p>
+            <h2 className="section-heading">{tr('revenue.heading', lang)}</h2>
           </FadeIn>
 
           <div className="revenue-grid">
             <FadeIn className="revenue-item">
-              <h3>Emotion-Aware Advertising</h3>
-              <p>belo doesn&apos;t just know what people talk about. It understands how they feel when they say it. Ad targeting based on mood and intent, not just demographics. Brands reach users when they&apos;re genuinely receptive.</p>
+              <h3>{tr('revenue.ads.title', lang)}</h3>
+              <p>{tr('revenue.ads.desc', lang)}</p>
             </FadeIn>
             <FadeIn className="revenue-item" delay={0.08}>
-              <h3>Marketing Intelligence</h3>
-              <p>Anonymized, aggregated communication patterns as a market research tool. Real-time emotional sentiment across cities, demographics, product categories. This data doesn&apos;t exist elsewhere.</p>
+              <h3>{tr('revenue.intel.title', lang)}</h3>
+              <p>{tr('revenue.intel.desc', lang)}</p>
             </FadeIn>
             <FadeIn className="revenue-item" delay={0.16}>
-              <h3>AI Data Licensing</h3>
-              <p>Paralinguistic patterns. Typing rhythms, emotional markers, communication cadence. Licensed to AI companies for training more human-like systems. Vector embeddings, not raw messages. With user consent.</p>
+              <h3>{tr('revenue.data.title', lang)}</h3>
+              <p>{tr('revenue.data.desc', lang)}</p>
             </FadeIn>
             <FadeIn className="revenue-item" delay={0.24}>
-              <h3>Premium &amp; Digital Twins</h3>
-              <p>Free users get the core experience. Premium tiers unlock Digital Twins. AI models of your communication style that draft messages in your voice, suggest responses, represent you in async conversations.</p>
+              <h3>{tr('revenue.premium.title', lang)}</h3>
+              <p>{tr('revenue.premium.desc', lang)}</p>
             </FadeIn>
             <FadeIn className="revenue-item" delay={0.32}>
-              <h3>Enterprise</h3>
-              <p>Communication analytics for teams. Sentiment tracking, burnout pattern detection, customer support tools that detect frustration in real time. The same ambient AI, applied to B2B.</p>
+              <h3>{tr('revenue.enterprise.title', lang)}</h3>
+              <p>{tr('revenue.enterprise.desc', lang)}</p>
             </FadeIn>
             <FadeIn className="revenue-item" delay={0.4}>
-              <h3>Regional Ad Market</h3>
-              <p>Uzbekistan&apos;s digital ad market projected at <span className="revenue-highlight">$368M</span> by 2028. Kazakhstan&apos;s internet ad revenue growing <span className="revenue-highlight">29%</span> year-over-year. Establishing belo as a core platform captures a share of this growth.</p>
+              <h3>{tr('revenue.admarket.title', lang)}</h3>
+              <p>{adParts[0]}<span className="revenue-highlight">$368M</span>{adParts[1]}<span className="revenue-highlight">29%</span>{adParts[2]}</p>
             </FadeIn>
           </div>
         </div>
@@ -327,32 +312,32 @@ export default function Home() {
 
         <div className="tech-content">
           <FadeIn>
-            <p className="section-label">Technology</p>
-            <h2 className="section-heading">Built on-device, designed to scale</h2>
+            <p className="section-label">{tr('tech.label', lang)}</p>
+            <h2 className="section-heading">{tr('tech.heading', lang)}</h2>
           </FadeIn>
 
           <FadeIn>
             <p className="section-text tech-body">
-              Sentiment analysis runs locally using micro transformer models. Mood scores, not messages, are exchanged between users via WebSocket. AI inference costs stay near zero. Message content never touches a server.
+              {tr('tech.body', lang)}
             </p>
           </FadeIn>
 
           <FadeIn delay={0.1}>
             <div className="tech-point">
-              <h3>On-Device AI</h3>
-              <p>Lightweight models process tone and context directly on the phone. Privacy is structural, not a policy.</p>
+              <h3>{tr('tech.ondevice.title', lang)}</h3>
+              <p>{tr('tech.ondevice.desc', lang)}</p>
             </div>
           </FadeIn>
           <FadeIn delay={0.2}>
             <div className="tech-point">
-              <h3>Digital Twins</h3>
-              <p>Over time, each user builds a vector-based profile of their communication style. Continuously updated embeddings, not fine-tuned models.</p>
+              <h3>{tr('tech.twins.title', lang)}</h3>
+              <p>{tr('tech.twins.desc', lang)}</p>
             </div>
           </FadeIn>
           <FadeIn delay={0.3}>
             <div className="tech-point">
-              <h3>Data as Embeddings</h3>
-              <p>Behavioral and emotional patterns stored as vector embeddings, never raw messages. Applications in health, marketing, education, and AI training. The product comes first.</p>
+              <h3>{tr('tech.embeddings.title', lang)}</h3>
+              <p>{tr('tech.embeddings.desc', lang)}</p>
             </div>
           </FadeIn>
         </div>
@@ -365,13 +350,13 @@ export default function Home() {
 
         <div className="sovereignty-content">
           <FadeIn>
-            <p className="section-label">Data sovereignty</p>
-            <h2 className="section-heading">Data generated in the region stays in the region</h2>
+            <p className="section-label">{tr('sovereignty.label', lang)}</p>
+            <h2 className="section-heading">{tr('sovereignty.heading', lang)}</h2>
             <p className="section-text">
-              Most global platforms extract user data from emerging markets and process it in foreign jurisdictions. GIOIA is building differently. Data sovereignty is a core architectural decision, not a compliance afterthought.
+              {tr('sovereignty.text1', lang)}
             </p>
             <p className="section-text" style={{ marginTop: '1.2em' }}>
-              Central Asian governments are investing in digital independence. Operating locally, with flexible data sovereignty frameworks, is a real structural advantage. The biggest barrier to cross-platform data use isn&apos;t technical. It&apos;s legal.
+              {tr('sovereignty.text2', lang)}
             </p>
           </FadeIn>
         </div>
@@ -386,8 +371,8 @@ export default function Home() {
         <FadeIn className={`close-content${formOpen ? ' shifted' : ''}`}>
           <h2 className="close-title">GIOIA</h2>
           <div className={`close-intro${formOpen ? ' out' : ''}`}>
-            <p className="close-text">Imagine more.</p>
-            <button className="close-cta" onClick={() => setFormOpen(true)}>Get in Touch</button>
+            <p className="close-text">{tr('close.text', lang)}</p>
+            <button className="close-cta" onClick={() => setFormOpen(true)}>{tr('close.cta', lang)}</button>
           </div>
           <div className={`contact-form-wrap${formOpen ? ' visible' : ''}`}>
             <form className={`contact-form${formStatus === 'sent' ? ' is-sent' : ''}`} onSubmit={async (e) => {
@@ -410,19 +395,19 @@ export default function Home() {
               }
             }}>
               <div className="contact-fields">
-                <input type="text" name="name" placeholder="Name" required />
-                <input type="email" name="email" placeholder="Email" required />
-                <input type="text" name="company" placeholder="Company (optional)" />
-                <textarea name="message" placeholder="Message" rows={4} required />
+                <input type="text" name="name" placeholder={tr('form.name', lang)} required />
+                <input type="email" name="email" placeholder={tr('form.email', lang)} required />
+                <input type="text" name="company" placeholder={tr('form.company', lang)} />
+                <textarea name="message" placeholder={tr('form.message', lang)} rows={4} required />
               </div>
               <div className="contact-actions">
                 <button type="submit" className="contact-submit" disabled={formStatus === 'sending' || formStatus === 'sent'}>
-                  {formStatus === 'sending' ? 'Sending...' : 'Send'}
+                  {formStatus === 'sending' ? tr('form.sending', lang) : tr('form.send', lang)}
                 </button>
-                <button type="button" className="contact-back" onClick={() => { setFormOpen(false); setFormStatus('idle'); }}>Back</button>
+                <button type="button" className="contact-back" onClick={() => { setFormOpen(false); setFormStatus('idle'); }}>{tr('form.back', lang)}</button>
               </div>
-              {formStatus === 'sent' && <p className="contact-success">Sent successfully.</p>}
-              {formStatus === 'error' && <p className="contact-error">Something went wrong. Please try again.</p>}
+              {formStatus === 'sent' && <p className="contact-success">{tr('form.success', lang)}</p>}
+              {formStatus === 'error' && <p className="contact-error">{tr('form.error', lang)}</p>}
             </form>
           </div>
         </FadeIn>
@@ -430,7 +415,7 @@ export default function Home() {
 
       {/* ===== FOOTER ===== */}
       <footer className="site-footer">
-        <p>&copy; 2026 GIOIA. All rights reserved.</p>
+        <p>{tr('footer.copy', lang)}</p>
       </footer>
     </main>
   );
