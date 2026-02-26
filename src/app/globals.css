@@ -438,6 +438,86 @@ h1, h2, h3, p {
 }
 
 /* ============================================
+   REVENUE SECTION
+   ============================================ */
+
+.revenue-section {
+  padding: 120px 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.revenue-section .section-bg {
+  opacity: 0.25;
+}
+
+.revenue-section .section-bg-fade {
+  background: radial-gradient(ellipse 75% 65% at center, transparent 25%, #0a0a0c 72%);
+}
+
+.revenue-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+.revenue-content .section-heading {
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 72px;
+}
+
+.revenue-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.revenue-item {
+  text-align: left;
+  padding: 32px 28px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.revenue-item:nth-child(2) {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.revenue-item:nth-child(odd) {
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.revenue-item h3 {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-style: italic;
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0 0 10px;
+}
+
+.revenue-item p {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 0.97rem;
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1.75;
+  margin: 0;
+}
+
+.revenue-highlight {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: white;
+  font-size: 1.05em;
+}
+
+/* ============================================
    TECHNOLOGY SECTION — editorial, no cards
    ============================================ */
 
@@ -919,6 +999,26 @@ h1, h2, h3, p {
 
   .market-stats {
     margin-bottom: 48px;
+  }
+
+  .revenue-section {
+    padding: 80px 24px;
+  }
+
+  .revenue-content .section-heading {
+    margin-bottom: 48px;
+  }
+
+  .revenue-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .revenue-item:nth-child(odd) {
+    border-right: none;
+  }
+
+  .revenue-item {
+    padding: 28px 0;
   }
 
   .tech-section {

@@ -282,6 +282,44 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ===== REVENUE ===== */}
+      <section className="revenue-section">
+
+        <div className="revenue-content">
+          <FadeIn>
+            <p className="section-label">Business model</p>
+            <h2 className="section-heading">The product is free. The business is in what it enables.</h2>
+          </FadeIn>
+
+          <div className="revenue-grid">
+            <FadeIn className="revenue-item">
+              <h3>Emotion-Aware Advertising</h3>
+              <p>belo doesn&apos;t just know what people talk about. It understands how they feel when they say it. Ad targeting based on mood and intent, not just demographics. Brands reach users when they&apos;re genuinely receptive.</p>
+            </FadeIn>
+            <FadeIn className="revenue-item" delay={0.08}>
+              <h3>Marketing Intelligence</h3>
+              <p>Anonymized, aggregated communication patterns as a market research tool. Real-time emotional sentiment across cities, demographics, product categories. This data doesn&apos;t exist elsewhere.</p>
+            </FadeIn>
+            <FadeIn className="revenue-item" delay={0.16}>
+              <h3>AI Data Licensing</h3>
+              <p>Paralinguistic patterns. Typing rhythms, emotional markers, communication cadence. Licensed to AI companies for training more human-like systems. Vector embeddings, not raw messages. With user consent.</p>
+            </FadeIn>
+            <FadeIn className="revenue-item" delay={0.24}>
+              <h3>Premium &amp; Digital Twins</h3>
+              <p>Free users get the core experience. Premium tiers unlock Digital Twins. AI models of your communication style that draft messages in your voice, suggest responses, represent you in async conversations.</p>
+            </FadeIn>
+            <FadeIn className="revenue-item" delay={0.32}>
+              <h3>Enterprise</h3>
+              <p>Communication analytics for teams. Sentiment tracking, burnout pattern detection, customer support tools that detect frustration in real time. The same ambient AI, applied to B2B.</p>
+            </FadeIn>
+            <FadeIn className="revenue-item" delay={0.4}>
+              <h3>Regional Ad Market</h3>
+              <p>Uzbekistan&apos;s digital ad market projected at <span className="revenue-highlight">$368M</span> by 2028. Kazakhstan&apos;s internet ad revenue growing <span className="revenue-highlight">29%</span> year-over-year. Establishing belo as a core platform captures a share of this growth.</p>
+            </FadeIn>
+          </div>
+        </div>
+      </section>
+
       {/* ===== TECHNOLOGY ===== */}
       <section className="tech-section">
         <img src="/images/tech-bg.webp" alt="" className="section-bg" />
