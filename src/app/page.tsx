@@ -282,7 +282,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ===== REVENUE ===== */}
+      {/* ===== REVENUE / BUSINESS MODEL ===== */}
       <section className="revenue-section">
 
         <div className="revenue-content">
