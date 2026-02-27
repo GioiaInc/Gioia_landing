@@ -37,6 +37,12 @@ export default function DocsHub() {
           GIOIA Docs
         </Link>
         <div className="docs-topbar-nav">
+          <Link href="/docs/archive" className="docs-topbar-link">
+            Archive
+          </Link>
+          <Link href="/docs/archive/upload" className="docs-topbar-link">
+            Upload
+          </Link>
           <Link href="/" className="docs-topbar-link">
             Home
           </Link>
