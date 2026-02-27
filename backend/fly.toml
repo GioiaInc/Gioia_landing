@@ -1,4 +1,4 @@
-app = 'gioia-archive'
+app = 'gioia-archive-v2'
 primary_region = 'iad'
 
 [build]
