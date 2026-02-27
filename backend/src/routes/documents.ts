@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import fs from 'fs';
 import path from 'path';
-import { getAllDocuments, getDocument, getDocumentBySlug, deleteDocument } from '../lib/db.js';
+import { getAllDocuments, getDocument, getDocumentBySlug, deleteDocument, insertDocument, updateDocumentContent, updateDocumentEnrichment, storeChunks } from '../lib/db.js';
 
 const documents = new Hono();
 
@@ -19,6 +19,28 @@ documents.get('/', (c) => {
       created_at: d.created_at,
     }))
   );
+});
+
+documents.post('/seed', async (c) => {
+  const { title, slug, content, summary, tags } = await c.req.json<{
+    title: string; slug: string; content: string; summary?: string; tags?: string[];
+  }>();
+
+  if (!title || !slug || !content) {
+    return c.json({ error: 'title, slug, and content are required' }, 400);
+  }
+
+  const existing = getDocumentBySlug(slug);
+  if (existing) {
+    return c.json({ id: existing.id, skipped: true });
+  }
+
+  const id = insertDocument('seeded', title, 'text/plain');
+  updateDocumentContent(id, content);
+  storeChunks(id, content);
+  updateDocumentEnrichment(id, title, summary || '', tags || [], undefined, slug);
+
+  return c.json({ id, seeded: true }, 201);
 });
 
 documents.get('/:id/status', (c) => {
