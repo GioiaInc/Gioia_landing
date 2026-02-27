@@ -160,6 +160,11 @@ export function getDocumentBySlug(slug: string): DocumentRow | undefined {
   return db.prepare('SELECT * FROM documents WHERE slug = ?').get(slug) as DocumentRow | undefined;
 }
 
+export function deleteDocument(id: number): boolean {
+  const result = db.prepare('DELETE FROM documents WHERE id = ?').run(id);
+  return result.changes > 0;
+}
+
 export function searchDocuments(query: string): DocumentRow[] {
   // FTS5 search — escape double quotes in query
   const safeQuery = query.replace(/"/g, '""');

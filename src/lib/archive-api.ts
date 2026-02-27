@@ -103,6 +103,20 @@ export async function getDocumentPage(slug: string): Promise<DocumentPage> {
   return res.json();
 }
 
+export async function deleteDocument(id: number, password: string): Promise<void> {
+  const res = await fetch(`${API_BASE}/api/documents/${id}/delete`, {
+    method: 'POST',
+    headers: {
+      ...headers(),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ password }),
+  });
+
+  if (res.status === 403) throw new Error('Wrong password');
+  if (!res.ok) throw new Error('Failed to delete document');
+}
+
 export async function getChatHistory(sessionId: string): Promise<ChatMessage[]> {
   const res = await fetch(`${API_BASE}/api/chat/history/${sessionId}`, {
     headers: headers(),
