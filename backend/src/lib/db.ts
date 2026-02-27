@@ -94,6 +94,10 @@ db.exec(`
   END;
 `);
 
+// Add columns for formatted doc pages (idempotent)
+try { db.exec('ALTER TABLE documents ADD COLUMN formatted_html TEXT'); } catch {}
+try { db.exec('ALTER TABLE documents ADD COLUMN slug TEXT'); } catch {}
+
 export interface DocumentRow {
   id: number;
   filename: string;
@@ -103,6 +107,8 @@ export interface DocumentRow {
   summary: string | null;
   tags: string;
   content_text: string | null;
+  formatted_html: string | null;
+  slug: string | null;
   status: string;
   created_at: string;
 }
@@ -123,11 +129,13 @@ export function updateDocumentEnrichment(
   id: number,
   title: string,
   summary: string,
-  tags: string[]
+  tags: string[],
+  formattedHtml?: string,
+  slug?: string
 ): void {
   db.prepare(
-    'UPDATE documents SET title = ?, summary = ?, tags = ?, status = ? WHERE id = ?'
-  ).run(title, summary, JSON.stringify(tags), 'ready', id);
+    'UPDATE documents SET title = ?, summary = ?, tags = ?, formatted_html = ?, slug = ?, status = ? WHERE id = ?'
+  ).run(title, summary, JSON.stringify(tags), formattedHtml ?? null, slug ?? null, 'ready', id);
 }
 
 export function updateDocumentError(id: number, error: string): void {
@@ -144,8 +152,12 @@ export function getDocument(id: number): DocumentRow | undefined {
 
 export function getAllDocuments(): DocumentRow[] {
   return db.prepare(
-    'SELECT id, filename, original_name, mime_type, title, summary, tags, status, created_at FROM documents ORDER BY created_at DESC'
+    'SELECT id, filename, original_name, mime_type, title, summary, tags, slug, status, created_at FROM documents ORDER BY created_at DESC'
   ).all() as DocumentRow[];
+}
+
+export function getDocumentBySlug(slug: string): DocumentRow | undefined {
+  return db.prepare('SELECT * FROM documents WHERE slug = ?').get(slug) as DocumentRow | undefined;
 }
 
 export function searchDocuments(query: string): DocumentRow[] {

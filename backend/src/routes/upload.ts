@@ -3,7 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import { insertDocument, updateDocumentContent, updateDocumentEnrichment, updateDocumentError, storeChunks } from '../lib/db.js';
 import { extractText, sanitizeFilename, getMimeType } from '../lib/extract.js';
-import { enrichDocument } from '../lib/enrichment.js';
+import { enrichDocument, formatDocument } from '../lib/enrichment.js';
 
 const DATA_DIR = process.env.DATA_DIR || '/data';
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
@@ -67,9 +67,25 @@ async function processDocument(
 
     // Enrich with Claude
     const enrichment = await enrichDocument(text, originalName);
-    updateDocumentEnrichment(id, enrichment.title, enrichment.summary, enrichment.tags);
 
-    console.log(`Document ${id} enriched: "${enrichment.title}"`);
+    // Format into HTML article
+    let formattedHtml: string | undefined;
+    try {
+      formattedHtml = await formatDocument(text, originalName);
+    } catch (err) {
+      console.error(`Formatting failed for doc ${id}, continuing without:`, err);
+    }
+
+    // Generate slug from title
+    const slug = enrichment.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '')
+      .substring(0, 80);
+
+    updateDocumentEnrichment(id, enrichment.title, enrichment.summary, enrichment.tags, formattedHtml, slug);
+
+    console.log(`Document ${id} enriched: "${enrichment.title}" (slug: ${slug})`);
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error';
     console.error(`Processing failed for doc ${id}:`, message);

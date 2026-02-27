@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { getAllDocuments, getDocument } from '../lib/db.js';
+import { getAllDocuments, getDocument, getDocumentBySlug } from '../lib/db.js';
 
 const documents = new Hono();
 
@@ -11,6 +11,7 @@ documents.get('/', (c) => {
       title: d.title,
       summary: d.summary,
       tags: JSON.parse(d.tags || '[]'),
+      slug: d.slug,
       status: d.status,
       original_name: d.original_name,
       created_at: d.created_at,
@@ -32,6 +33,25 @@ documents.get('/:id/status', (c) => {
     title: doc.title,
     summary: doc.summary,
     tags: JSON.parse(doc.tags || '[]'),
+  });
+});
+
+documents.get('/:slug/page', (c) => {
+  const slug = c.req.param('slug');
+  const doc = getDocumentBySlug(slug);
+
+  if (!doc || !doc.formatted_html) {
+    return c.json({ error: 'Not found' }, 404);
+  }
+
+  return c.json({
+    id: doc.id,
+    formatted_html: doc.formatted_html,
+    title: doc.title,
+    summary: doc.summary,
+    tags: JSON.parse(doc.tags || '[]'),
+    slug: doc.slug,
+    created_at: doc.created_at,
   });
 });
 
