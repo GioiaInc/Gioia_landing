@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { searchDocuments, getDocumentFullText, getDocumentChunkCount, searchInDocument } from './db.js';
+import { searchDocuments, getDocumentFullText, getDocumentChunkCount, searchInDocument, getAllDocuments } from './db.js';
 
 const anthropic = new Anthropic();
 
@@ -7,9 +7,18 @@ const SMALL_DOC_THRESHOLD = 8000; // docs under this are returned in full
 
 const tools: Anthropic.Tool[] = [
   {
+    name: 'list_all_documents',
+    description:
+      'List all documents in the archive with their titles, dates, summaries, and IDs. Use this when the user asks about a specific date, wants to browse available docs, or when keyword search returns no results.',
+    input_schema: {
+      type: 'object' as const,
+      properties: {},
+    },
+  },
+  {
     name: 'search_documents',
     description:
-      'Search across all documents in the archive. Returns matching document titles, summaries, and text snippets. Use this to find relevant documents before reading them in full.',
+      'Search across all documents in the archive by keyword. Returns matching document titles, summaries, dates, and text snippets. Use this to find relevant documents before reading them in full.',
     input_schema: {
       type: 'object' as const,
       properties: {
@@ -58,6 +67,24 @@ const tools: Anthropic.Tool[] = [
 ];
 
 function executeTool(name: string, input: Record<string, unknown>): string {
+  if (name === 'list_all_documents') {
+    const docs = getAllDocuments();
+    if (docs.length === 0) {
+      return 'No documents in the archive yet.';
+    }
+    return JSON.stringify(
+      docs.map((d) => ({
+        id: d.id,
+        title: d.title,
+        summary: d.summary,
+        tags: d.tags,
+        date: d.created_at,
+      })),
+      null,
+      2
+    );
+  }
+
   if (name === 'search_documents') {
     const query = String(input.query || '');
     const results = searchDocuments(query);
@@ -70,6 +97,7 @@ function executeTool(name: string, input: Record<string, unknown>): string {
         title: r.title,
         summary: r.summary,
         tags: r.tags,
+        date: r.created_at,
         snippet: (r as unknown as Record<string, unknown>).snippet || null,
       })),
       null,
@@ -129,18 +157,20 @@ export async function* streamChat(
 
   const systemPrompt = `You are the GIOIA Archive assistant. You help team members find information across their document archive — meeting notes, strategy docs, plans, etc.
 
-You have three tools:
+You have four tools:
+- list_all_documents: browse all docs with titles, dates, and IDs — use this for date-based queries or when search returns nothing
 - search_documents: search across all docs by keyword
 - read_document: read a specific doc (returns full text for short docs, preview for long ones)
 - search_in_document: search within a long document for relevant chunks
 
 Workflow for answering questions:
-1. search_documents to find relevant docs
-2. read_document to get the content
-3. If the doc is long, use search_in_document with specific keywords to find the relevant sections
+1. For date-based questions ("what happened on Feb 20?"), use list_all_documents to find by date
+2. For topic-based questions, use search_documents to find relevant docs
+3. Use read_document to get the content
+4. If the doc is long, use search_in_document with specific keywords to find the relevant sections
 
 Guidelines:
-- Always search before answering substantive questions
+- Always search or list before answering substantive questions
 - Cite which documents you drew information from
 - If you can't find relevant documents, say so honestly
 - Keep answers concise and actionable
@@ -148,6 +178,10 @@ Guidelines:
 
   // Agentic loop — up to 5 tool-use rounds
   for (let round = 0; round < 5; round++) {
+    if (round > 0) {
+      yield '\n\n';
+    }
+
     const stream = anthropic.messages.stream({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 2048,

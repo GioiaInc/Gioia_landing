@@ -22,8 +22,8 @@ documents.get('/', (c) => {
 });
 
 documents.post('/seed', async (c) => {
-  const { title, slug, content, summary, tags } = await c.req.json<{
-    title: string; slug: string; content: string; summary?: string; tags?: string[];
+  const { title, slug, content, summary, tags, date, force } = await c.req.json<{
+    title: string; slug: string; content: string; summary?: string; tags?: string[]; date?: string; force?: boolean;
   }>();
 
   if (!title || !slug || !content) {
@@ -31,14 +31,23 @@ documents.post('/seed', async (c) => {
   }
 
   const existing = getDocumentBySlug(slug);
-  if (existing) {
+  if (existing && !force) {
     return c.json({ id: existing.id, skipped: true });
+  }
+  if (existing && force) {
+    deleteDocument(existing.id);
   }
 
   const id = insertDocument('seeded', title, 'text/plain');
   updateDocumentContent(id, content);
   storeChunks(id, content);
   updateDocumentEnrichment(id, title, summary || '', tags || [], undefined, slug);
+
+  // Set created_at to the original doc date if provided
+  if (date) {
+    const db = (await import('../lib/db.js')).default;
+    db.prepare('UPDATE documents SET created_at = ? WHERE id = ?').run(date, id);
+  }
 
   return c.json({ id, seeded: true }, 201);
 });
