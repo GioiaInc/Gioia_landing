@@ -124,6 +124,44 @@ async function processHtmlContent(
   console.log(`Document ${id} (HTML) enriched: "${enrichment.title}" (slug: ${slug})`);
 }
 
+upload.post('/url/check', async (c) => {
+  const body = await c.req.json<{ url?: string }>();
+  const url = body.url?.trim();
+
+  if (!url) {
+    return c.json({ ok: false, error: 'No URL provided' }, 400);
+  }
+
+  try {
+    new URL(url);
+  } catch {
+    return c.json({ ok: false, error: 'Invalid URL' }, 400);
+  }
+
+  try {
+    const rawHtml = await fetchUrlContent(url);
+    const bodyHtml = extractHtmlBody(rawHtml);
+    const plainText = htmlToPlainText(bodyHtml);
+
+    // Extract <title> if present
+    const titleMatch = rawHtml.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+    const title = titleMatch ? titleMatch[1].trim() : '';
+
+    // First ~200 chars of plain text as a snippet
+    const snippet = plainText.substring(0, 200) + (plainText.length > 200 ? '…' : '');
+
+    return c.json({
+      ok: true,
+      title: title || null,
+      snippet,
+      contentLength: rawHtml.length,
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    return c.json({ ok: false, error: message }, 422);
+  }
+});
+
 upload.post('/url', async (c) => {
   const body = await c.req.json<{ url?: string }>();
   const url = body.url?.trim();

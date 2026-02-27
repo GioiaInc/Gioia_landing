@@ -2,15 +2,18 @@
 
 import { useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import { uploadFile, uploadUrl, getDocumentStatus } from '@/lib/archive-api';
+import { uploadFile, uploadUrl, checkUrl, getDocumentStatus } from '@/lib/archive-api';
 
-type UploadState = 'idle' | 'dragging' | 'uploading' | 'processing' | 'done' | 'error';
+type UploadState = 'idle' | 'dragging' | 'checking' | 'preview' | 'uploading' | 'processing' | 'done' | 'error';
 
 export default function UploadPage() {
   const [state, setState] = useState<UploadState>('idle');
   const [title, setTitle] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [urlInput, setUrlInput] = useState('');
+  const [previewTitle, setPreviewTitle] = useState('');
+  const [previewSnippet, setPreviewSnippet] = useState('');
+  const [checkedUrl, setCheckedUrl] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const pollStatus = useCallback(async (id: number, fallbackName: string) => {
@@ -51,18 +54,49 @@ export default function UploadPage() {
     const url = urlInput.trim();
     if (!url) return;
 
+    setState('checking');
+    setErrorMsg('');
+
+    try {
+      const result = await checkUrl(url);
+      if (!result.ok) {
+        setErrorMsg(result.error || 'Could not fetch URL');
+        setState('error');
+        return;
+      }
+      setPreviewTitle(result.title || new URL(url).hostname);
+      setPreviewSnippet(result.snippet || '');
+      setCheckedUrl(url);
+      setState('preview');
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : 'Could not fetch URL');
+      setState('error');
+    }
+  }, [urlInput]);
+
+  const confirmUrl = useCallback(async () => {
+    if (!checkedUrl) return;
+
     setState('uploading');
     setErrorMsg('');
 
     try {
-      const { id } = await uploadUrl(url);
+      const { id } = await uploadUrl(checkedUrl);
       setUrlInput('');
-      pollStatus(id, url);
+      setCheckedUrl('');
+      pollStatus(id, previewTitle);
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : 'Upload failed');
       setState('error');
     }
-  }, [urlInput, pollStatus]);
+  }, [checkedUrl, previewTitle, pollStatus]);
+
+  const cancelPreview = useCallback(() => {
+    setState('idle');
+    setCheckedUrl('');
+    setPreviewTitle('');
+    setPreviewSnippet('');
+  }, []);
 
   const onDrop = useCallback(
     (e: React.DragEvent) => {
@@ -88,7 +122,10 @@ export default function UploadPage() {
     if (state === 'idle' || state === 'done' || state === 'error') {
       fileInputRef.current?.click();
     }
-  }, [state]);
+    if (state === 'preview') {
+      confirmUrl();
+    }
+  }, [state, confirmUrl]);
 
   const onFileChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -102,6 +139,8 @@ export default function UploadPage() {
   const circleClass = [
     'upload-circle',
     state === 'dragging' && 'upload-circle-dragging',
+    state === 'checking' && 'upload-circle-uploading',
+    state === 'preview' && 'upload-circle-preview',
     state === 'uploading' && 'upload-circle-uploading',
     state === 'processing' && 'upload-circle-processing',
     state === 'done' && 'upload-circle-done',
@@ -143,6 +182,21 @@ export default function UploadPage() {
           )}
           {state === 'dragging' && (
             <span className="upload-label">Drop it</span>
+          )}
+          {state === 'checking' && (
+            <>
+              <span className="upload-dot" />
+              <span className="upload-label">Checking link…</span>
+            </>
+          )}
+          {state === 'preview' && (
+            <>
+              <span className="upload-preview-title">{previewTitle}</span>
+              {previewSnippet && (
+                <span className="upload-preview-snippet">{previewSnippet}</span>
+              )}
+              <span className="upload-sub">Tap to process with AI</span>
+            </>
           )}
           {state === 'uploading' && (
             <>
@@ -190,12 +244,18 @@ export default function UploadPage() {
                 type="submit"
                 className="upload-url-btn"
                 disabled={!urlInput.trim()}
-                aria-label="Upload URL"
+                aria-label="Check URL"
               >
                 &#8594;
               </button>
             </form>
           </div>
+        )}
+
+        {state === 'preview' && (
+          <button className="upload-cancel-link" onClick={cancelPreview}>
+            cancel
+          </button>
         )}
 
         <input
@@ -319,6 +379,51 @@ export default function UploadPage() {
           color: #d9534f;
           font-weight: 700;
           line-height: 1;
+        }
+
+        .upload-circle-preview {
+          border-style: solid;
+          border-color: #c17c5f;
+          cursor: pointer;
+        }
+
+        .upload-preview-title {
+          font-family: 'Cormorant Garamond', Georgia, serif;
+          font-size: 1.05rem;
+          font-weight: 600;
+          color: #1a1a1a;
+          line-height: 1.3;
+          text-align: center;
+        }
+
+        .upload-preview-snippet {
+          font-family: 'Montserrat', sans-serif;
+          font-size: 0.55rem;
+          color: #8a8580;
+          line-height: 1.5;
+          text-align: center;
+          max-height: 3.5em;
+          overflow: hidden;
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+        }
+
+        .upload-cancel-link {
+          font-family: 'Montserrat', sans-serif;
+          font-size: 0.6rem;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          color: #b0aaa4;
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 0;
+          transition: color 0.2s;
+        }
+
+        .upload-cancel-link:hover {
+          color: #1a1a1a;
         }
 
         .upload-url-section {

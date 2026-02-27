@@ -76,6 +76,32 @@ export async function uploadFile(file: File): Promise<{ id: number; status: stri
   return res.json();
 }
 
+export interface UrlCheckResult {
+  ok: boolean;
+  title?: string | null;
+  snippet?: string;
+  contentLength?: number;
+  error?: string;
+}
+
+export async function checkUrl(url: string): Promise<UrlCheckResult> {
+  const res = await fetch(`${API_BASE}/api/upload/url/check`, {
+    method: 'POST',
+    headers: {
+      ...headers(),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ url }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ ok: false, error: 'Check failed' }));
+    throw new Error(err.error || 'Check failed');
+  }
+
+  return res.json();
+}
+
 export async function uploadUrl(url: string): Promise<{ id: number; status: string }> {
   const res = await fetch(`${API_BASE}/api/upload/url`, {
     method: 'POST',
