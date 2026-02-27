@@ -116,6 +116,13 @@ function ArchiveDocPage({ archiveSlug }: { archiveSlug: string }) {
         />
       </article>
 
+      {editConfirm && (
+        <div className="docs-edit-toast">
+          <span className="docs-edit-toast-icon">&#10003;</span>
+          Done! Your edit has been applied.
+        </div>
+      )}
+
       <div className="docs-edit-bar">
         <form onSubmit={handleEdit} className="docs-edit-form">
           <input
@@ -127,14 +134,39 @@ function ArchiveDocPage({ archiveSlug }: { archiveSlug: string }) {
             disabled={editing}
           />
         </form>
-        {editConfirm && <p className="docs-edit-confirm">Edit applied</p>}
       </div>
 
-      <footer className="docs-footer">
-        <p className="docs-footer-text">&copy; 2026 GIOIA</p>
-      </footer>
-
       <style jsx>{`
+        .docs-edit-toast {
+          position: fixed;
+          top: 5rem;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 100;
+          font-family: 'Cormorant Garamond', Georgia, serif;
+          font-size: 1.05rem;
+          font-style: italic;
+          color: #3a3530;
+          background: #faf9f6;
+          border: 1px solid #e0dbd5;
+          border-radius: 100px;
+          padding: 0.7rem 1.6rem;
+          box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+          pointer-events: none;
+          animation: docs-toast-life 2.8s ease forwards;
+          white-space: nowrap;
+        }
+        .docs-edit-toast-icon {
+          color: #c17c5f;
+          margin-right: 0.5rem;
+          font-style: normal;
+        }
+        @keyframes docs-toast-life {
+          0% { opacity: 0; transform: translateX(-50%) translateY(-8px); }
+          10% { opacity: 1; transform: translateX(-50%) translateY(0); }
+          75% { opacity: 1; transform: translateX(-50%) translateY(0); }
+          100% { opacity: 0; transform: translateX(-50%) translateY(-8px); }
+        }
         .docs-edit-bar {
           position: fixed;
           bottom: 0;
@@ -175,22 +207,6 @@ function ArchiveDocPage({ archiveSlug }: { archiveSlug: string }) {
         }
         .docs-edit-input:disabled {
           opacity: 0.6;
-        }
-        .docs-edit-confirm {
-          font-family: 'Montserrat', sans-serif;
-          font-size: 0.65rem;
-          letter-spacing: 0.15em;
-          text-transform: uppercase;
-          color: #c17c5f;
-          margin: 0.5rem 0 0;
-          pointer-events: none;
-          animation: docs-edit-fade 2.5s ease forwards;
-        }
-        @keyframes docs-edit-fade {
-          0% { opacity: 0; transform: translateY(4px); }
-          15% { opacity: 1; transform: translateY(0); }
-          70% { opacity: 1; }
-          100% { opacity: 0; }
         }
       `}</style>
 
