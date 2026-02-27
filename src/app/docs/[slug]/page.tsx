@@ -45,10 +45,13 @@ function NotFound() {
   );
 }
 
+type DocTab = 'summary' | 'preview' | 'link';
+
 function ArchiveDocPage({ archiveSlug }: { archiveSlug: string }) {
   const [page, setPage] = useState<DocumentPage | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [activeTab, setActiveTab] = useState<DocTab>('summary');
   const [editInput, setEditInput] = useState('');
   const [editing, setEditing] = useState(false);
   const [editConfirm, setEditConfirm] = useState(false);
@@ -106,6 +109,9 @@ function ArchiveDocPage({ archiveSlug }: { archiveSlug: string }) {
   if (error || !page) return <NotFound />;
 
   const dateStr = page.created_at?.split('T')[0]?.split(' ')[0];
+  const hasPreview = !!page.source_html;
+  const hasLink = !!page.source_url;
+  const hasSecondTab = hasPreview || hasLink;
 
   return (
     <>
@@ -119,10 +125,64 @@ function ArchiveDocPage({ archiveSlug }: { archiveSlug: string }) {
         <h1 className="docs-article-title">{page.title}</h1>
         {dateStr && <p className="docs-article-date">{dateStr}</p>}
 
-        <div
-          className={`docs-article-body${editing ? ' docs-edit-shimmer' : ''}`}
-          dangerouslySetInnerHTML={{ __html: page.formatted_html }}
-        />
+        {hasSecondTab && (
+          <div className="doc-tabs">
+            <button
+              className={`doc-tab${activeTab === 'summary' ? ' doc-tab-active' : ''}`}
+              onClick={() => setActiveTab('summary')}
+            >
+              Summary
+            </button>
+            {hasPreview && (
+              <button
+                className={`doc-tab${activeTab === 'preview' ? ' doc-tab-active' : ''}`}
+                onClick={() => setActiveTab('preview')}
+              >
+                Preview
+              </button>
+            )}
+            {hasLink && !hasPreview && (
+              <a
+                className="doc-tab"
+                href={page.source_url!}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Source &#8599;
+              </a>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'summary' && (
+          <div
+            className={`docs-article-body${editing ? ' docs-edit-shimmer' : ''}`}
+            dangerouslySetInnerHTML={{ __html: page.formatted_html }}
+          />
+        )}
+
+        {activeTab === 'preview' && hasPreview && (
+          <>
+            {hasLink && (
+              <a
+                className="doc-source-link"
+                href={page.source_url!}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Open original &#8599;
+              </a>
+            )}
+            <div className="doc-preview-frame">
+              <iframe
+                srcDoc={page.source_html!}
+                className="doc-preview-iframe"
+                sandbox="allow-same-origin"
+                title="Original document preview"
+              />
+            </div>
+          </>
+        )}
       </article>
 
       {editConfirm && (
@@ -157,6 +217,59 @@ function ArchiveDocPage({ archiveSlug }: { archiveSlug: string }) {
       </div>
 
       <style jsx>{`
+        .doc-tabs {
+          display: flex;
+          gap: 0;
+          margin-bottom: 1.8rem;
+          border-bottom: 1px solid #e8e4df;
+        }
+        .doc-tab {
+          font-family: 'Montserrat', sans-serif;
+          font-size: 0.6rem;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          color: #b0aaa4;
+          background: none;
+          border: none;
+          border-bottom: 2px solid transparent;
+          padding: 0.5rem 1.2rem;
+          cursor: pointer;
+          transition: color 0.2s, border-color 0.2s;
+          text-decoration: none;
+        }
+        .doc-tab:hover {
+          color: #1a1a1a;
+        }
+        .doc-tab-active {
+          color: #1a1a1a;
+          border-bottom-color: #c17c5f;
+        }
+        .doc-source-link {
+          display: inline-block;
+          font-family: 'Montserrat', sans-serif;
+          font-size: 0.6rem;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: #c17c5f;
+          text-decoration: none;
+          margin-bottom: 1rem;
+          transition: opacity 0.2s;
+        }
+        .doc-source-link:hover {
+          opacity: 0.7;
+        }
+        .doc-preview-frame {
+          border: 1px solid #e8e4df;
+          border-radius: 6px;
+          overflow: hidden;
+          background: #fff;
+        }
+        .doc-preview-iframe {
+          width: 100%;
+          min-height: 70vh;
+          border: none;
+          display: block;
+        }
         .docs-edit-toast {
           position: fixed;
           top: 5rem;

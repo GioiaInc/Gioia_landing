@@ -42,6 +42,8 @@ export interface DocumentPage {
   summary: string | null;
   tags: string[];
   slug: string | null;
+  source_html: string | null;
+  source_url: string | null;
   created_at: string;
 }
 

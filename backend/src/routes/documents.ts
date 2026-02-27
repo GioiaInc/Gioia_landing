@@ -85,6 +85,8 @@ documents.get('/:slug/page', (c) => {
     summary: doc.summary,
     tags: JSON.parse(doc.tags || '[]'),
     slug: doc.slug,
+    source_html: doc.source_html ?? null,
+    source_url: doc.source_url ?? null,
     created_at: doc.created_at,
   });
 });

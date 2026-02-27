@@ -103,7 +103,8 @@ async function processDocument(
 async function processHtmlContent(
   id: number,
   rawHtml: string,
-  originalName: string
+  originalName: string,
+  sourceUrl?: string
 ): Promise<void> {
   const bodyHtml = extractHtmlBody(rawHtml);
   const plainText = htmlToPlainText(bodyHtml);
@@ -113,13 +114,26 @@ async function processHtmlContent(
 
   const enrichment = await enrichDocument(plainText, originalName);
 
+  // Generate AI-formatted doc (same as txt/pdf pipeline)
+  let formattedHtml: string | undefined;
+  try {
+    formattedHtml = await formatDocument(plainText, originalName);
+  } catch (err) {
+    console.error(`Formatting failed for doc ${id}, continuing without:`, err);
+  }
+
   const slug = enrichment.title
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '')
     .substring(0, 80);
 
-  updateDocumentEnrichment(id, enrichment.title, enrichment.summary, enrichment.tags, bodyHtml, slug);
+  updateDocumentEnrichment(id, enrichment.title, enrichment.summary, enrichment.tags, formattedHtml, slug);
+
+  // Save the original HTML body for the Preview tab, and source URL for the Link tab
+  const db = (await import('../lib/db.js')).default;
+  db.prepare('UPDATE documents SET source_html = ?, source_url = ? WHERE id = ?')
+    .run(bodyHtml, sourceUrl ?? null, id);
 
   console.log(`Document ${id} (HTML) enriched: "${enrichment.title}" (slug: ${slug})`);
 }
@@ -187,7 +201,7 @@ upload.post('/url', async (c) => {
   (async () => {
     try {
       const rawHtml = await fetchUrlContent(url);
-      await processHtmlContent(id, rawHtml, originalName);
+      await processHtmlContent(id, rawHtml, originalName, url);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unknown error';
       console.error(`URL processing failed for doc ${id}:`, message);

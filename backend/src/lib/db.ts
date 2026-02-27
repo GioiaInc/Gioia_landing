@@ -97,6 +97,8 @@ db.exec(`
 // Add columns for formatted doc pages (idempotent)
 try { db.exec('ALTER TABLE documents ADD COLUMN formatted_html TEXT'); } catch {}
 try { db.exec('ALTER TABLE documents ADD COLUMN slug TEXT'); } catch {}
+try { db.exec('ALTER TABLE documents ADD COLUMN source_html TEXT'); } catch {}
+try { db.exec('ALTER TABLE documents ADD COLUMN source_url TEXT'); } catch {}
 
 export interface DocumentRow {
   id: number;
@@ -109,6 +111,8 @@ export interface DocumentRow {
   content_text: string | null;
   formatted_html: string | null;
   slug: string | null;
+  source_html: string | null;
+  source_url: string | null;
   status: string;
   created_at: string;
 }
