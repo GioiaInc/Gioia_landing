@@ -1,7 +1,8 @@
 import { Hono } from 'hono';
 import fs from 'fs';
 import path from 'path';
-import { getAllDocuments, getDocument, getDocumentBySlug, deleteDocument, insertDocument, updateDocumentContent, updateDocumentEnrichment, storeChunks } from '../lib/db.js';
+import { getAllDocuments, getDocument, getDocumentBySlug, deleteDocument, insertDocument, updateDocumentContent, updateDocumentEnrichment, updateFormattedHtml, storeChunks } from '../lib/db.js';
+import { editDocument } from '../lib/enrichment.js';
 
 const documents = new Hono();
 
@@ -108,6 +109,25 @@ documents.post('/:id/delete', async (c) => {
 
   deleteDocument(id);
   return c.json({ ok: true });
+});
+
+documents.post('/:id/ai-edit', async (c) => {
+  const id = Number(c.req.param('id'));
+  const { instruction } = await c.req.json<{ instruction: string }>();
+
+  if (!instruction) {
+    return c.json({ error: 'instruction is required' }, 400);
+  }
+
+  const doc = getDocument(id);
+  if (!doc || !doc.formatted_html) {
+    return c.json({ error: 'Not found' }, 404);
+  }
+
+  const newHtml = await editDocument(doc.formatted_html, instruction);
+  updateFormattedHtml(id, newHtml);
+
+  return c.json({ formatted_html: newHtml });
 });
 
 export default documents;

@@ -117,6 +117,24 @@ export async function deleteDocument(id: number, password: string): Promise<void
   if (!res.ok) throw new Error('Failed to delete document');
 }
 
+export async function aiEditDocument(id: number, instruction: string): Promise<{ formatted_html: string }> {
+  const res = await fetch(`${API_BASE}/api/documents/${id}/ai-edit`, {
+    method: 'POST',
+    headers: {
+      ...headers(),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ instruction }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: 'Edit failed' }));
+    throw new Error(err.error || 'Edit failed');
+  }
+
+  return res.json();
+}
+
 export async function getChatHistory(sessionId: string): Promise<ChatMessage[]> {
   const res = await fetch(`${API_BASE}/api/chat/history/${sessionId}`, {
     headers: headers(),

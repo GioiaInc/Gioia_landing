@@ -190,6 +190,10 @@ export function searchDocuments(query: string): DocumentRow[] {
   }
 }
 
+export function updateFormattedHtml(id: number, html: string): void {
+  db.prepare('UPDATE documents SET formatted_html = ? WHERE id = ?').run(html, id);
+}
+
 export function getDocumentFullText(id: number): string | null {
   const row = db.prepare('SELECT content_text FROM documents WHERE id = ?').get(id) as
     | { content_text: string | null }

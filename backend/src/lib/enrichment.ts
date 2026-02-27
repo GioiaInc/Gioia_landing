@@ -105,3 +105,44 @@ Respond with ONLY the HTML, no markdown fences or explanation.`,
 
   return content.text.trim();
 }
+
+/**
+ * Apply a natural-language edit instruction to an existing HTML article.
+ * Returns the updated HTML string.
+ */
+export async function editDocument(currentHtml: string, instruction: string): Promise<string> {
+  const message = await anthropic.messages.create({
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 4096,
+    messages: [
+      {
+        role: 'user',
+        content: `You are editing an HTML article based on a user's instruction. Apply the requested change and return the updated HTML.
+
+Here is the current HTML:
+
+<article>
+${currentHtml}
+</article>
+
+User's edit instruction: "${instruction}"
+
+Rules:
+- Make minimal changes — only modify what the instruction asks for
+- Output ONLY the updated HTML body content (no <html>, <head>, <body>, or <article> tags)
+- Use only <p>, <h2>, <br/> tags — no <div>, <ul>, <strong>, <em>, or other tags
+- Do NOT include a <h1> title
+- Preserve the existing structure and formatting style
+
+Respond with ONLY the HTML, no markdown fences or explanation.`,
+      },
+    ],
+  });
+
+  const content = message.content[0];
+  if (content.type !== 'text') {
+    throw new Error('Unexpected response type from Claude');
+  }
+
+  return content.text.trim();
+}
