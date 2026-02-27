@@ -29,8 +29,19 @@ export interface ArchiveDocument {
   title: string | null;
   summary: string | null;
   tags: string[];
+  slug: string | null;
   status: string;
   original_name: string;
+  created_at: string;
+}
+
+export interface DocumentPage {
+  id: number;
+  formatted_html: string;
+  title: string | null;
+  summary: string | null;
+  tags: string[];
+  slug: string | null;
   created_at: string;
 }
 
@@ -80,6 +91,15 @@ export async function getDocumentStatus(id: number): Promise<DocumentStatus> {
   });
 
   if (!res.ok) throw new Error('Failed to fetch status');
+  return res.json();
+}
+
+export async function getDocumentPage(slug: string): Promise<DocumentPage> {
+  const res = await fetch(`${API_BASE}/api/documents/${slug}/page`, {
+    headers: headers(),
+  });
+
+  if (!res.ok) throw new Error('Failed to fetch document page');
   return res.json();
 }
 
