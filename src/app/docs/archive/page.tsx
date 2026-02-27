@@ -15,6 +15,52 @@ function nextMsgId() {
   return `msg-${++msgCounter}-${Date.now()}`;
 }
 
+function renderMarkdown(text: string): string {
+  if (!text) return '';
+  let html = text
+    // Escape HTML
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    // Code blocks (``` ... ```)
+    .replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
+    // Inline code
+    .replace(/`([^`]+)`/g, '<code class="chat-inline-code">$1</code>')
+    // Bold
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    // Italic
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    // Links
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+    // Headings (###, ##, #)
+    .replace(/^### (.+)$/gm, '<strong style="font-size:1.05em">$1</strong>')
+    .replace(/^## (.+)$/gm, '<strong style="font-size:1.1em">$1</strong>')
+    .replace(/^# (.+)$/gm, '<strong style="font-size:1.15em">$1</strong>');
+
+  // Unordered lists
+  html = html.replace(/(^|\n)([-*] .+(?:\n[-*] .+)*)/g, (_, pre, block) => {
+    const items = block.split('\n').map((line: string) =>
+      `<li>${line.replace(/^[-*] /, '')}</li>`
+    ).join('');
+    return `${pre}<ul>${items}</ul>`;
+  });
+
+  // Ordered lists
+  html = html.replace(/(^|\n)(\d+\. .+(?:\n\d+\. .+)*)/g, (_, pre, block) => {
+    const items = block.split('\n').map((line: string) =>
+      `<li>${line.replace(/^\d+\. /, '')}</li>`
+    ).join('');
+    return `${pre}<ol>${items}</ol>`;
+  });
+
+  // Paragraphs (double newlines)
+  html = html.replace(/\n\n/g, '</p><p>');
+  // Single newlines to <br>
+  html = html.replace(/\n/g, '<br>');
+
+  return html;
+}
+
 export default function ArchiveChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -170,8 +216,17 @@ export default function ArchiveChatPage() {
               <div
                 className={msg.role === 'user' ? 'chat-bubble chat-bubble-user' : 'chat-bubble chat-bubble-assistant'}
               >
-                {msg.content}
-                {showCursorForId === msg.id && <span className="chat-cursor" />}
+                {msg.role === 'assistant' ? (
+                  <>
+                    <span dangerouslySetInnerHTML={{ __html: renderMarkdown(msg.content) }} />
+                    {showCursorForId === msg.id && <span className="chat-cursor" />}
+                  </>
+                ) : (
+                  <>
+                    {msg.content}
+                    {showCursorForId === msg.id && <span className="chat-cursor" />}
+                  </>
+                )}
               </div>
             </div>
           ))}
@@ -199,6 +254,13 @@ export default function ArchiveChatPage() {
       </div>
 
       <style jsx global>{`
+        .docs-topbar {
+          position: sticky;
+          top: 0;
+          z-index: 10;
+          background: #faf9f6;
+        }
+
         .chat-page {
           display: flex;
           flex-direction: column;
@@ -208,7 +270,7 @@ export default function ArchiveChatPage() {
 
         .chat-messages {
           flex: 1;
-          max-width: 640px;
+          max-width: 820px;
           width: 100%;
           margin: 0 auto;
           padding: 2rem 1.5rem 120px;
@@ -250,11 +312,11 @@ export default function ArchiveChatPage() {
           font-size: 1.1rem;
           line-height: 1.7;
           color: #1a1a1a;
-          white-space: pre-wrap;
           word-break: break-word;
         }
 
         .chat-bubble-user {
+          white-space: pre-wrap;
           background: #f0ece7;
           padding: 0.75rem 1.15rem;
           border-radius: 18px 18px 4px 18px;
@@ -310,7 +372,7 @@ export default function ArchiveChatPage() {
         }
 
         .chat-input-form {
-          max-width: 540px;
+          max-width: 700px;
           width: 100%;
           pointer-events: auto;
         }
@@ -341,6 +403,63 @@ export default function ArchiveChatPage() {
 
         .chat-input:disabled {
           opacity: 0.6;
+        }
+
+        /* Markdown styles in assistant messages */
+        .chat-bubble-assistant pre {
+          background: #f0ece7;
+          border-radius: 8px;
+          padding: 0.75rem 1rem;
+          overflow-x: auto;
+          margin: 0.5rem 0;
+          font-family: 'SF Mono', 'Fira Code', 'Fira Mono', monospace;
+          font-size: 0.85rem;
+          line-height: 1.5;
+        }
+
+        .chat-bubble-assistant pre code {
+          font-family: inherit;
+          font-size: inherit;
+        }
+
+        .chat-inline-code {
+          background: #f0ece7;
+          padding: 0.15em 0.4em;
+          border-radius: 4px;
+          font-family: 'SF Mono', 'Fira Code', 'Fira Mono', monospace;
+          font-size: 0.88em;
+        }
+
+        .chat-bubble-assistant strong {
+          font-weight: 700;
+        }
+
+        .chat-bubble-assistant em {
+          font-style: italic;
+        }
+
+        .chat-bubble-assistant a {
+          color: #c17c5f;
+          text-decoration: underline;
+          text-underline-offset: 2px;
+        }
+
+        .chat-bubble-assistant a:hover {
+          color: #a0624a;
+        }
+
+        .chat-bubble-assistant ul,
+        .chat-bubble-assistant ol {
+          margin: 0.4rem 0;
+          padding-left: 1.5rem;
+        }
+
+        .chat-bubble-assistant li {
+          margin-bottom: 0.2rem;
+        }
+
+        .chat-bubble-assistant p {
+          margin: 0.4rem 0;
         }
 
         @media (max-width: 540px) {
