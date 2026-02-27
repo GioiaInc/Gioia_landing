@@ -14,8 +14,9 @@ export default function DocsHub() {
     getDocuments()
       .then((archiveDocs) => {
         const idMap: Record<string, number> = {};
+        const staticSlugs = new Set(docs.map((d) => d.slug));
         const converted: DocEntry[] = archiveDocs
-          .filter((d: ArchiveDocument) => d.status === 'ready' && d.slug)
+          .filter((d: ArchiveDocument) => d.status === 'ready' && d.slug && !staticSlugs.has(d.slug!))
           .map((d: ArchiveDocument) => {
             const slug = `archive-${d.slug}`;
             idMap[slug] = d.id;
