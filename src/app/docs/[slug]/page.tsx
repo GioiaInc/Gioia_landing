@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getDoc } from '@/lib/docs-config';
 import { docsContent } from '@/content/docs';
 import { getDocumentPage, aiEditDocument, type DocumentPage } from '@/lib/archive-api';
@@ -52,6 +52,8 @@ function ArchiveDocPage({ archiveSlug }: { archiveSlug: string }) {
   const [editInput, setEditInput] = useState('');
   const [editing, setEditing] = useState(false);
   const [editConfirm, setEditConfirm] = useState(false);
+  const [sentText, setSentText] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     getDocumentPage(archiveSlug)
@@ -64,17 +66,24 @@ function ArchiveDocPage({ archiveSlug }: { archiveSlug: string }) {
     e.preventDefault();
     if (!editInput.trim() || !page || editing) return;
 
+    const instruction = editInput.trim();
+    setSentText(instruction);
+    setEditInput('');
     setEditing(true);
+
+    // Clear the flying text after animation completes
+    setTimeout(() => setSentText(null), 600);
+
     try {
-      const result = await aiEditDocument(page.id, editInput.trim());
+      const result = await aiEditDocument(page.id, instruction);
       setPage({ ...page, formatted_html: result.formatted_html });
-      setEditInput('');
       setEditConfirm(true);
       setTimeout(() => setEditConfirm(false), 2500);
     } catch {
       // silently fail — user can retry
     } finally {
       setEditing(false);
+      inputRef.current?.focus();
     }
   };
 
@@ -125,14 +134,25 @@ function ArchiveDocPage({ archiveSlug }: { archiveSlug: string }) {
 
       <div className="docs-edit-bar">
         <form onSubmit={handleEdit} className="docs-edit-form">
-          <input
-            type="text"
-            value={editInput}
-            onChange={(e) => setEditInput(e.target.value)}
-            placeholder="Edit this document…"
-            className="docs-edit-input"
-            disabled={editing}
-          />
+          <div className="docs-edit-input-wrap">
+            {sentText && (
+              <span className="docs-edit-fly">{sentText}</span>
+            )}
+            <input
+              ref={inputRef}
+              type="text"
+              value={editInput}
+              onChange={(e) => setEditInput(e.target.value)}
+              placeholder={editing ? '' : 'Edit this document…'}
+              className="docs-edit-input"
+              disabled={editing}
+            />
+            {editing && (
+              <span className="docs-edit-dots">
+                <span /><span /><span />
+              </span>
+            )}
+          </div>
         </form>
       </div>
 
@@ -184,6 +204,9 @@ function ArchiveDocPage({ archiveSlug }: { archiveSlug: string }) {
           width: 100%;
           pointer-events: auto;
         }
+        .docs-edit-input-wrap {
+          position: relative;
+        }
         .docs-edit-input {
           width: 100%;
           padding: 0.85rem 1.5rem;
@@ -206,7 +229,63 @@ function ArchiveDocPage({ archiveSlug }: { archiveSlug: string }) {
           box-shadow: 0 2px 16px rgba(193, 124, 95, 0.1);
         }
         .docs-edit-input:disabled {
-          opacity: 0.6;
+          opacity: 1;
+        }
+
+        /* --- Flying text animation --- */
+        .docs-edit-fly {
+          position: absolute;
+          left: 1.5rem;
+          top: 50%;
+          transform: translateY(-50%);
+          font-family: 'Cormorant Garamond', Georgia, serif;
+          font-size: 1.05rem;
+          color: #c17c5f;
+          pointer-events: none;
+          white-space: nowrap;
+          overflow: hidden;
+          max-width: calc(100% - 3rem);
+          text-overflow: ellipsis;
+          animation: docs-fly-up 0.55s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+          z-index: 2;
+        }
+        @keyframes docs-fly-up {
+          0% {
+            opacity: 1;
+            transform: translateY(-50%) scale(1);
+          }
+          100% {
+            opacity: 0;
+            transform: translateY(calc(-50% - 60px)) scale(0.92);
+          }
+        }
+
+        /* --- Loading dots --- */
+        .docs-edit-dots {
+          position: absolute;
+          left: 1.5rem;
+          top: 50%;
+          transform: translateY(-50%);
+          display: flex;
+          gap: 5px;
+          align-items: center;
+        }
+        .docs-edit-dots span {
+          width: 5px;
+          height: 5px;
+          border-radius: 50%;
+          background: #c17c5f;
+          animation: docs-dot-pulse 1.2s ease-in-out infinite;
+        }
+        .docs-edit-dots span:nth-child(2) {
+          animation-delay: 0.15s;
+        }
+        .docs-edit-dots span:nth-child(3) {
+          animation-delay: 0.3s;
+        }
+        @keyframes docs-dot-pulse {
+          0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+          40% { opacity: 1; transform: scale(1.1); }
         }
       `}</style>
 
