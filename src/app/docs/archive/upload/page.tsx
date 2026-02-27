@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import { uploadFile, getDocumentStatus } from '@/lib/archive-api';
+import { uploadFile, uploadUrl, getDocumentStatus } from '@/lib/archive-api';
 
 type UploadState = 'idle' | 'dragging' | 'uploading' | 'processing' | 'done' | 'error';
 
@@ -10,7 +10,29 @@ export default function UploadPage() {
   const [state, setState] = useState<UploadState>('idle');
   const [title, setTitle] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [urlInput, setUrlInput] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const pollStatus = useCallback(async (id: number, fallbackName: string) => {
+    setState('processing');
+    for (let i = 0; i < 60; i++) {
+      await new Promise((r) => setTimeout(r, 2000));
+      const status = await getDocumentStatus(id);
+
+      if (status.status === 'ready') {
+        setTitle(status.title || fallbackName);
+        setState('done');
+        return;
+      }
+      if (status.status === 'error') {
+        setErrorMsg(status.summary || 'Processing failed');
+        setState('error');
+        return;
+      }
+    }
+    setErrorMsg('Processing timed out');
+    setState('error');
+  }, []);
 
   const handleFile = useCallback(async (file: File) => {
     setState('uploading');
@@ -18,35 +40,29 @@ export default function UploadPage() {
 
     try {
       const { id } = await uploadFile(file);
-      setState('processing');
-
-      // Poll for enrichment completion
-      const poll = async () => {
-        for (let i = 0; i < 60; i++) {
-          await new Promise((r) => setTimeout(r, 2000));
-          const status = await getDocumentStatus(id);
-
-          if (status.status === 'ready') {
-            setTitle(status.title || file.name);
-            setState('done');
-            return;
-          }
-          if (status.status === 'error') {
-            setErrorMsg(status.summary || 'Processing failed');
-            setState('error');
-            return;
-          }
-        }
-        setErrorMsg('Processing timed out');
-        setState('error');
-      };
-
-      poll();
+      pollStatus(id, file.name);
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : 'Upload failed');
       setState('error');
     }
-  }, []);
+  }, [pollStatus]);
+
+  const handleUrl = useCallback(async () => {
+    const url = urlInput.trim();
+    if (!url) return;
+
+    setState('uploading');
+    setErrorMsg('');
+
+    try {
+      const { id } = await uploadUrl(url);
+      setUrlInput('');
+      pollStatus(id, url);
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : 'Upload failed');
+      setState('error');
+    }
+  }, [urlInput, pollStatus]);
 
   const onDrop = useCallback(
     (e: React.DragEvent) => {
@@ -122,7 +138,7 @@ export default function UploadPage() {
             <>
               <span className="upload-icon">+</span>
               <span className="upload-label">Drop a file here</span>
-              <span className="upload-sub">.txt, .md, .pdf</span>
+              <span className="upload-sub">.txt, .md, .pdf, .html</span>
             </>
           )}
           {state === 'dragging' && (
@@ -156,10 +172,36 @@ export default function UploadPage() {
           )}
         </div>
 
+        {(state === 'idle' || state === 'done' || state === 'error') && (
+          <div className="upload-url-section">
+            <span className="upload-url-divider">or paste a URL</span>
+            <form
+              className="upload-url-form"
+              onSubmit={(e) => { e.preventDefault(); handleUrl(); }}
+            >
+              <input
+                type="url"
+                className="upload-url-input"
+                placeholder="https://…"
+                value={urlInput}
+                onChange={(e) => setUrlInput(e.target.value)}
+              />
+              <button
+                type="submit"
+                className="upload-url-btn"
+                disabled={!urlInput.trim()}
+                aria-label="Upload URL"
+              >
+                &#8594;
+              </button>
+            </form>
+          </div>
+        )}
+
         <input
           ref={fileInputRef}
           type="file"
-          accept=".txt,.md,.pdf"
+          accept=".txt,.md,.pdf,.html,.htm"
           onChange={onFileChange}
           style={{ display: 'none' }}
         />
@@ -168,10 +210,12 @@ export default function UploadPage() {
       <style jsx global>{`
         .upload-page {
           display: flex;
+          flex-direction: column;
           align-items: center;
           justify-content: center;
           min-height: calc(100vh - 65px);
           padding: 2rem;
+          gap: 1.5rem;
         }
 
         .upload-circle {
@@ -275,6 +319,71 @@ export default function UploadPage() {
           color: #d9534f;
           font-weight: 700;
           line-height: 1;
+        }
+
+        .upload-url-section {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.75rem;
+        }
+
+        .upload-url-divider {
+          font-family: 'Montserrat', sans-serif;
+          font-size: 0.6rem;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          color: #b0aaa4;
+        }
+
+        .upload-url-form {
+          display: flex;
+          align-items: center;
+          gap: 0;
+          border: 1.5px solid #ddd8d2;
+          border-radius: 999px;
+          overflow: hidden;
+          transition: border-color 0.2s ease;
+        }
+
+        .upload-url-form:focus-within {
+          border-color: #c17c5f;
+        }
+
+        .upload-url-input {
+          font-family: 'Montserrat', sans-serif;
+          font-size: 0.75rem;
+          letter-spacing: 0.03em;
+          border: none;
+          outline: none;
+          background: transparent;
+          padding: 0.55rem 0.9rem;
+          width: 240px;
+          color: #1a1a1a;
+        }
+
+        .upload-url-input::placeholder {
+          color: #c0bbb5;
+        }
+
+        .upload-url-btn {
+          font-size: 1rem;
+          background: none;
+          border: none;
+          color: #c17c5f;
+          padding: 0.5rem 0.75rem;
+          cursor: pointer;
+          line-height: 1;
+          transition: opacity 0.2s;
+        }
+
+        .upload-url-btn:disabled {
+          color: #ddd8d2;
+          cursor: default;
+        }
+
+        .upload-url-btn:not(:disabled):hover {
+          opacity: 0.7;
         }
 
         @media (max-width: 540px) {

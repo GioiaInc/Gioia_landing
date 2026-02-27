@@ -76,6 +76,24 @@ export async function uploadFile(file: File): Promise<{ id: number; status: stri
   return res.json();
 }
 
+export async function uploadUrl(url: string): Promise<{ id: number; status: string }> {
+  const res = await fetch(`${API_BASE}/api/upload/url`, {
+    method: 'POST',
+    headers: {
+      ...headers(),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ url }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: 'Upload failed' }));
+    throw new Error(err.error || 'Upload failed');
+  }
+
+  return res.json();
+}
+
 export async function getDocuments(): Promise<ArchiveDocument[]> {
   const res = await fetch(`${API_BASE}/api/documents`, {
     headers: headers(),
