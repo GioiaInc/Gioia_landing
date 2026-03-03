@@ -15,10 +15,13 @@ function Topbar() {
       </Link>
       <div className="docs-topbar-nav">
         <Link href="/docs/archive" className="docs-topbar-link">
-          Archive
+          Ask AI
         </Link>
         <Link href="/docs/archive/upload" className="docs-topbar-link">
           Upload
+        </Link>
+        <Link href="/docs" className="docs-topbar-link">
+          Docs
         </Link>
         <Link href="/" className="docs-topbar-link">
           Home

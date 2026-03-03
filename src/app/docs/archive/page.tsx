@@ -171,6 +171,7 @@ export default function ArchiveChatPage() {
           <Link href="/docs" className="docs-topbar-brand">GIOIA Docs</Link>
           <div className="docs-topbar-nav">
             <Link href="/docs/archive/upload" className="docs-topbar-link">Upload</Link>
+            <Link href="/docs" className="docs-topbar-link">Docs</Link>
             <Link href="/" className="docs-topbar-link">Home</Link>
           </div>
         </nav>
@@ -196,6 +197,7 @@ export default function ArchiveChatPage() {
             </button>
           )}
           <Link href="/docs/archive/upload" className="docs-topbar-link">Upload</Link>
+          <Link href="/docs" className="docs-topbar-link">Docs</Link>
           <Link href="/" className="docs-topbar-link">Home</Link>
         </div>
       </nav>
