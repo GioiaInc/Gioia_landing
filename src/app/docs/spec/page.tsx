@@ -43,45 +43,93 @@ function renderMarkdown(text: string): string {
   return html;
 }
 
-function slugify(text: string): string {
-  return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+/** Convert edited HTML back to clean markdown */
+function htmlToMarkdown(el: HTMLElement): string {
+  const lines: string[] = [];
+
+  function walk(node: Node) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      lines.push(node.textContent || '');
+      return;
+    }
+    if (node.nodeType !== Node.ELEMENT_NODE) return;
+    const tag = (node as HTMLElement).tagName.toLowerCase();
+
+    if (tag === 'h1') {
+      lines.push('\n# ' + (node as HTMLElement).textContent?.trim() + '\n');
+    } else if (tag === 'h2') {
+      lines.push('\n## ' + (node as HTMLElement).textContent?.trim() + '\n');
+    } else if (tag === 'h3') {
+      lines.push('\n### ' + (node as HTMLElement).textContent?.trim() + '\n');
+    } else if (tag === 'p') {
+      lines.push('\n');
+      walkChildren(node);
+      lines.push('\n');
+    } else if (tag === 'br') {
+      lines.push('\n');
+    } else if (tag === 'strong' || tag === 'b') {
+      lines.push('**');
+      walkChildren(node);
+      lines.push('**');
+    } else if (tag === 'em' || tag === 'i') {
+      lines.push('*');
+      walkChildren(node);
+      lines.push('*');
+    } else if (tag === 'code') {
+      const parent = (node as HTMLElement).closest('pre');
+      if (parent) {
+        lines.push('\n```\n' + (node as HTMLElement).textContent + '\n```\n');
+      } else {
+        lines.push('`' + (node as HTMLElement).textContent + '`');
+      }
+    } else if (tag === 'pre') {
+      // code block — handled by inner <code>
+      const code = (node as HTMLElement).querySelector('code');
+      if (code) {
+        lines.push('\n```\n' + code.textContent + '\n```\n');
+      } else {
+        lines.push('\n```\n' + (node as HTMLElement).textContent + '\n```\n');
+      }
+    } else if (tag === 'ul') {
+      lines.push('\n');
+      const items = (node as HTMLElement).querySelectorAll(':scope > li');
+      items.forEach((li) => {
+        lines.push('-   ' + li.textContent?.trim() + '\n');
+      });
+      lines.push('\n');
+    } else if (tag === 'ol') {
+      lines.push('\n');
+      const items = (node as HTMLElement).querySelectorAll(':scope > li');
+      items.forEach((li, i) => {
+        lines.push((i + 1) + '. ' + li.textContent?.trim() + '\n');
+      });
+      lines.push('\n');
+    } else if (tag === 'blockquote') {
+      lines.push('\n> ' + (node as HTMLElement).textContent?.trim() + '\n');
+    } else if (tag === 'a') {
+      const href = (node as HTMLAnchorElement).getAttribute('href') || '';
+      lines.push('[' + (node as HTMLElement).textContent + '](' + href + ')');
+    } else if (tag === 'li') {
+      // handled by parent ul/ol
+    } else {
+      walkChildren(node);
+    }
+  }
+
+  function walkChildren(node: Node) {
+    node.childNodes.forEach(walk);
+  }
+
+  el.childNodes.forEach(walk);
+
+  // Clean up: collapse 3+ newlines to 2, trim
+  return lines.join('')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim() + '\n';
 }
 
-// Simple markdown editor with save
-function MarkdownEditor({
-  markdown,
-  onSave,
-  onCancel,
-}: {
-  markdown: string;
-  onSave: (md: string) => void;
-  onCancel: () => void;
-}) {
-  const [value, setValue] = useState(markdown);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  useEffect(() => {
-    textareaRef.current?.focus();
-  }, []);
-
-  return (
-    <div className="spec-editor">
-      <div className="spec-editor-toolbar">
-        <span className="spec-editor-label">Editing Markdown</span>
-        <div className="spec-editor-actions">
-          <button className="spec-editor-btn spec-editor-cancel" onClick={onCancel}>Cancel</button>
-          <button className="spec-editor-btn spec-editor-save" onClick={() => onSave(value)}>Save</button>
-        </div>
-      </div>
-      <textarea
-        ref={textareaRef}
-        className="spec-editor-textarea"
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        spellCheck={false}
-      />
-    </div>
-  );
+function slugify(text: string): string {
+  return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
 export default function SpecPage() {
@@ -96,6 +144,7 @@ export default function SpecPage() {
   const [activeSection, setActiveSection] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [dirty, setDirty] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
 
@@ -155,21 +204,46 @@ export default function SpecPage() {
     }
   };
 
-  const handleManualSave = async (newMarkdown: string) => {
-    if (!spec) return;
+  const startEditing = () => {
+    setEditing(true);
+    setDirty(false);
+    // Make body editable after render
+    requestAnimationFrame(() => {
+      if (bodyRef.current) {
+        bodyRef.current.contentEditable = 'true';
+        bodyRef.current.focus();
+      }
+    });
+  };
+
+  const cancelEditing = () => {
+    setEditing(false);
+    setDirty(false);
+    // Reset content to original
+    if (bodyRef.current && spec) {
+      bodyRef.current.contentEditable = 'false';
+      bodyRef.current.innerHTML = renderMarkdown(spec.markdown);
+    }
+  };
+
+  const saveEditing = async () => {
+    if (!bodyRef.current || !spec) return;
     setBusy(true);
     try {
+      const newMarkdown = htmlToMarkdown(bodyRef.current);
       const API_BASE = process.env.NEXT_PUBLIC_ARCHIVE_API || 'http://localhost:3001';
       const token = typeof window !== 'undefined' ? localStorage.getItem('gioia-docs-token') || '' : '';
       const res = await fetch(`${API_BASE}/api/spec/edit`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ markdown: newMarkdown, instruction: 'Manual edit via web editor' }),
+        body: JSON.stringify({ markdown: newMarkdown, instruction: 'Manual inline edit' }),
       });
       if (!res.ok) throw new Error('Save failed');
+      bodyRef.current.contentEditable = 'false';
       const updated = await getSpec();
       setSpec(updated);
       setEditing(false);
+      setDirty(false);
       showToast('Saved');
     } catch {
       showToast('Save failed');
@@ -266,25 +340,36 @@ export default function SpecPage() {
             </Link>
           </p>
 
-          {!editing && (
-            <button className="spec-edit-toggle" onClick={() => setEditing(true)}>
-              Edit Markdown
+          {/* Edit controls */}
+          {!editing ? (
+            <button className="spec-edit-toggle" onClick={startEditing}>
+              Edit
             </button>
+          ) : (
+            <div className="spec-edit-bar-inline">
+              <span className="spec-edit-bar-label">Editing</span>
+              <div className="spec-edit-bar-actions">
+                <button className="spec-edit-bar-btn spec-edit-bar-cancel" onClick={cancelEditing}>
+                  Cancel
+                </button>
+                <button
+                  className="spec-edit-bar-btn spec-edit-bar-save"
+                  onClick={saveEditing}
+                  disabled={busy}
+                >
+                  {busy ? 'Saving\u2026' : 'Save'}
+                </button>
+              </div>
+            </div>
           )}
 
-          {editing ? (
-            <MarkdownEditor
-              markdown={spec.markdown}
-              onSave={handleManualSave}
-              onCancel={() => setEditing(false)}
-            />
-          ) : (
-            <div
-              ref={bodyRef}
-              className={`docs-article-body spec-body${busy && mode === 'edit' ? ' docs-edit-shimmer' : ''}`}
-              dangerouslySetInnerHTML={{ __html: renderMarkdown(spec.markdown) }}
-            />
-          )}
+          <div
+            ref={bodyRef}
+            className={`docs-article-body spec-body${editing ? ' spec-body-editing' : ''}${busy && mode === 'edit' && !editing ? ' docs-edit-shimmer' : ''}`}
+            dangerouslySetInnerHTML={{ __html: renderMarkdown(spec.markdown) }}
+            onInput={() => { if (editing && !dirty) setDirty(true); }}
+            suppressContentEditableWarning
+          />
         </article>
       </div>
 
@@ -395,6 +480,29 @@ export default function SpecPage() {
         }
         .spec-edit-toggle:hover { color: #1a1a1a; border-color: #c17c5f; }
 
+        .spec-edit-bar-inline {
+          display: flex; align-items: center; justify-content: space-between;
+          padding: 0.6rem 1rem; margin-bottom: 1.5rem;
+          background: #faf9f6; border: 1px solid #c17c5f; border-radius: 8px;
+          position: sticky; top: 65px; z-index: 10;
+          box-shadow: 0 2px 12px rgba(193,124,95,0.08);
+        }
+        .spec-edit-bar-label {
+          font-family: 'Montserrat', sans-serif; font-size: 0.55rem; font-weight: 600;
+          letter-spacing: 0.15em; text-transform: uppercase; color: #c17c5f;
+        }
+        .spec-edit-bar-actions { display: flex; gap: 0.5rem; }
+        .spec-edit-bar-btn {
+          font-family: 'Montserrat', sans-serif; font-size: 0.55rem; letter-spacing: 0.12em;
+          text-transform: uppercase; border: 1px solid #e0dbd5; border-radius: 100px;
+          padding: 0.3rem 0.85rem; cursor: pointer; transition: all 0.2s;
+        }
+        .spec-edit-bar-cancel { color: #a09890; background: none; }
+        .spec-edit-bar-cancel:hover { color: #1a1a1a; border-color: #aaa; }
+        .spec-edit-bar-save { color: #fff; background: #c17c5f; border-color: #c17c5f; }
+        .spec-edit-bar-save:hover { background: #a8694f; }
+        .spec-edit-bar-save:disabled { opacity: 0.6; cursor: default; }
+
         .spec-answer-overlay {
           position: fixed; inset: 0; background: rgba(0,0,0,0.3);
           display: flex; align-items: center; justify-content: center; z-index: 200; padding: 2rem;
@@ -431,6 +539,19 @@ export default function SpecPage() {
 
       <style jsx global>{`
         .spec-body { scroll-behavior: smooth; }
+        .spec-body-editing {
+          outline: none;
+          border-radius: 8px;
+          padding: 0.5rem;
+          margin: -0.5rem;
+          background: rgba(193,124,95,0.02);
+          border: 1px dashed rgba(193,124,95,0.15);
+          cursor: text;
+        }
+        .spec-body-editing:focus {
+          background: rgba(193,124,95,0.03);
+          border-color: rgba(193,124,95,0.25);
+        }
         .spec-h1 { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 300; font-size: 2rem; color: #1a1a1a; margin: 2rem 0 1rem; }
         .spec-h2 { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 600; font-size: 1.5rem; color: #1a1a1a; margin: 3rem 0 1rem; padding-top: 1.5rem; border-top: 1px solid #e8e4df; scroll-margin-top: 90px; }
         .spec-h3 { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 600; font-size: 1.15rem; color: #3a3530; margin: 2rem 0 0.75rem; scroll-margin-top: 90px; }
@@ -440,33 +561,6 @@ export default function SpecPage() {
         .spec-bq { border-left: 3px solid #c17c5f; padding: 0.5rem 1rem; margin: 0 0 1.25rem; color: #6a6560; font-style: italic; }
         .spec-code { background: #f0ece7; padding: 1rem; border-radius: 4px; overflow-x: auto; font-size: 0.85em; margin: 0 0 1.25rem; }
         .spec-inline-code { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.85em; background: #f0ece7; padding: 0.15em 0.4em; border-radius: 2px; color: #5a5550; }
-
-        .spec-editor { margin-bottom: 2rem; }
-        .spec-editor-toolbar {
-          display: flex; align-items: center; justify-content: space-between;
-          padding: 0.6rem 0; margin-bottom: 0.5rem; border-bottom: 1px solid #e8e4df;
-        }
-        .spec-editor-label {
-          font-family: 'Montserrat', sans-serif; font-size: 0.55rem; font-weight: 600;
-          letter-spacing: 0.15em; text-transform: uppercase; color: #a09890;
-        }
-        .spec-editor-actions { display: flex; gap: 0.5rem; }
-        .spec-editor-btn {
-          font-family: 'Montserrat', sans-serif; font-size: 0.55rem; letter-spacing: 0.12em;
-          text-transform: uppercase; border: 1px solid #e0dbd5; border-radius: 100px;
-          padding: 0.35rem 0.9rem; cursor: pointer; transition: all 0.2s;
-        }
-        .spec-editor-cancel { color: #a09890; background: none; }
-        .spec-editor-cancel:hover { color: #1a1a1a; border-color: #aaa; }
-        .spec-editor-save { color: #fff; background: #c17c5f; border-color: #c17c5f; }
-        .spec-editor-save:hover { background: #a8694f; }
-        .spec-editor-textarea {
-          width: 100%; min-height: 70vh; padding: 1.25rem; font-family: 'SF Mono', 'Fira Code', monospace;
-          font-size: 0.85rem; line-height: 1.7; color: #2a2a2a; background: #fefefe;
-          border: 1px solid #e8e4df; border-radius: 6px; outline: none; resize: vertical;
-          tab-size: 2;
-        }
-        .spec-editor-textarea:focus { border-color: #c17c5f; }
 
         .docs-edit-toast {
           position: fixed; top: 5rem; left: 50%; transform: translateX(-50%); z-index: 100;
