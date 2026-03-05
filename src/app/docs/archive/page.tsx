@@ -170,6 +170,7 @@ export default function ArchiveChatPage() {
         <nav className="docs-topbar">
           <Link href="/docs" className="docs-topbar-brand">GIOIA Docs</Link>
           <div className="docs-topbar-nav">
+            <Link href="/docs/spec" className="docs-topbar-link">Spec</Link>
             <Link href="/docs/archive/upload" className="docs-topbar-link">Upload</Link>
             <Link href="/docs" className="docs-topbar-link">Docs</Link>
             <Link href="/" className="docs-topbar-link">Home</Link>

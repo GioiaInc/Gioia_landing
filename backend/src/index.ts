@@ -5,6 +5,7 @@ import { authMiddleware } from './lib/auth.js';
 import upload from './routes/upload.js';
 import documents from './routes/documents.js';
 import chat from './routes/chat.js';
+import spec from './routes/spec.js';
 
 const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',')
@@ -35,6 +36,7 @@ app.use('/api/*', authMiddleware);
 app.route('/api/upload', upload);
 app.route('/api/documents', documents);
 app.route('/api/chat', chat);
+app.route('/api/spec', spec);
 
 const port = Number(process.env.PORT) || 3001;
 

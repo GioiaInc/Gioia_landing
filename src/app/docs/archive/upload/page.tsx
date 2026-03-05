@@ -156,6 +156,9 @@ export default function UploadPage() {
           GIOIA Docs
         </Link>
         <div className="docs-topbar-nav">
+          <Link href="/docs/spec" className="docs-topbar-link">
+            Spec
+          </Link>
           <Link href="/docs/archive" className="docs-topbar-link">
             Ask AI
           </Link>
