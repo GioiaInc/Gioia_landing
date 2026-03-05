@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { getSpec, editSpecAI, askSpecAI, type SpecData } from '@/lib/spec-api';
 
-type Mode = 'edit' | 'ask';
+type Mode = 'ai-edit' | 'ask' | 'edit';
 
 function renderMarkdown(text: string): string {
   if (!text) return '';
@@ -135,7 +135,7 @@ function slugify(text: string): string {
 export default function SpecPage() {
   const [spec, setSpec] = useState<SpecData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [mode, setMode] = useState<Mode>('edit');
+  const [mode, setMode] = useState<Mode>('ai-edit');
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
   const [sentText, setSentText] = useState<string | null>(null);
@@ -143,8 +143,8 @@ export default function SpecPage() {
   const [answer, setAnswer] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [editing, setEditing] = useState(false);
   const [dirty, setDirty] = useState(false);
+  const [scrollPct, setScrollPct] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
 
@@ -154,6 +154,8 @@ export default function SpecPage() {
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
+
+  const editing = mode === 'edit';
 
   useEffect(() => {
     if (!spec || !bodyRef.current || editing) return;
@@ -172,6 +174,17 @@ export default function SpecPage() {
     return () => observer.disconnect();
   }, [spec, editing]);
 
+  // Scroll progress tracker
+  useEffect(() => {
+    const onScroll = () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (docHeight > 0) setScrollPct(Math.min(scrollTop / docHeight, 1));
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   const showToast = (msg: string) => {
     setToast(msg);
     setTimeout(() => setToast(null), 3000);
@@ -187,7 +200,7 @@ export default function SpecPage() {
     setAnswer(null);
     setTimeout(() => setSentText(null), 600);
     try {
-      if (mode === 'edit') {
+      if (mode === 'ai-edit') {
         const result = await editSpecAI(text);
         const updated = await getSpec();
         setSpec(updated);
@@ -204,27 +217,25 @@ export default function SpecPage() {
     }
   };
 
-  const startEditing = () => {
-    setEditing(true);
+  const enterEditMode = useCallback(() => {
+    setMode('edit');
     setDirty(false);
-    // Make body editable after render
     requestAnimationFrame(() => {
       if (bodyRef.current) {
         bodyRef.current.contentEditable = 'true';
         bodyRef.current.focus();
       }
     });
-  };
+  }, []);
 
-  const cancelEditing = () => {
-    setEditing(false);
+  const exitEditMode = useCallback(() => {
+    setMode('ai-edit');
     setDirty(false);
-    // Reset content to original
     if (bodyRef.current && spec) {
       bodyRef.current.contentEditable = 'false';
       bodyRef.current.innerHTML = renderMarkdown(spec.markdown);
     }
-  };
+  }, [spec]);
 
   const saveEditing = async () => {
     if (!bodyRef.current || !spec) return;
@@ -242,7 +253,7 @@ export default function SpecPage() {
       bodyRef.current.contentEditable = 'false';
       const updated = await getSpec();
       setSpec(updated);
-      setEditing(false);
+      setMode('ai-edit');
       setDirty(false);
       showToast('Saved');
     } catch {
@@ -251,6 +262,26 @@ export default function SpecPage() {
       setBusy(false);
     }
   };
+
+  const handleScrollBarDrag = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    const onMove = (ev: MouseEvent | TouchEvent) => {
+      const clientY = 'touches' in ev ? ev.touches[0].clientY : ev.clientY;
+      const pct = Math.max(0, Math.min(1, (clientY - 65) / (window.innerHeight - 65)));
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      window.scrollTo({ top: pct * docHeight });
+    };
+    const onUp = () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+      window.removeEventListener('touchmove', onMove);
+      window.removeEventListener('touchend', onUp);
+    };
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    window.addEventListener('touchmove', onMove);
+    window.addEventListener('touchend', onUp);
+  }, []);
 
   const scrollToSection = useCallback((title: string) => {
     const id = 's-' + slugify(title);
@@ -340,16 +371,11 @@ export default function SpecPage() {
             </Link>
           </p>
 
-          {/* Edit controls */}
-          {!editing ? (
-            <button className="spec-edit-toggle" onClick={startEditing}>
-              Edit
-            </button>
-          ) : (
+          {editing && (
             <div className="spec-edit-bar-inline">
               <span className="spec-edit-bar-label">Editing</span>
               <div className="spec-edit-bar-actions">
-                <button className="spec-edit-bar-btn spec-edit-bar-cancel" onClick={cancelEditing}>
+                <button className="spec-edit-bar-btn spec-edit-bar-cancel" onClick={exitEditMode}>
                   Cancel
                 </button>
                 <button
@@ -365,7 +391,7 @@ export default function SpecPage() {
 
           <div
             ref={bodyRef}
-            className={`docs-article-body spec-body${editing ? ' spec-body-editing' : ''}${busy && mode === 'edit' && !editing ? ' docs-edit-shimmer' : ''}`}
+            className={`docs-article-body spec-body${editing ? ' spec-body-editing' : ''}${busy && mode === 'ai-edit' ? ' docs-edit-shimmer' : ''}`}
             dangerouslySetInnerHTML={{ __html: renderMarkdown(spec.markdown) }}
             onInput={() => { if (editing && !dirty) setDirty(true); }}
             suppressContentEditableWarning
@@ -389,14 +415,33 @@ export default function SpecPage() {
         </div>
       )}
 
-      {!editing && (
-        <div className="spec-bottom-bar">
-          <div className="spec-mode-toggle">
-            <button className={`spec-mode-btn${mode === 'edit' ? ' spec-mode-active' : ''}`}
-              onClick={() => { setMode('edit'); setAnswer(null); }}>AI Edit</button>
-            <button className={`spec-mode-btn${mode === 'ask' ? ' spec-mode-active' : ''}`}
-              onClick={() => setMode('ask')}>Ask</button>
-          </div>
+      {/* Scroll progress bar */}
+      <div
+        className="spec-scroll-track"
+        onClick={(e) => {
+          const pct = Math.max(0, Math.min(1, (e.clientY - 65) / (window.innerHeight - 65)));
+          const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+          window.scrollTo({ top: pct * docHeight, behavior: 'smooth' });
+        }}
+      >
+        <div
+          className="spec-scroll-thumb"
+          style={{ top: `${scrollPct * 100}%` }}
+          onMouseDown={handleScrollBarDrag}
+          onTouchStart={handleScrollBarDrag}
+        />
+      </div>
+
+      <div className="spec-bottom-bar">
+        <div className="spec-mode-toggle">
+          <button className={`spec-mode-btn${mode === 'ai-edit' ? ' spec-mode-active' : ''}`}
+            onClick={() => { if (editing) exitEditMode(); setMode('ai-edit'); setAnswer(null); }}>AI Edit</button>
+          <button className={`spec-mode-btn${mode === 'ask' ? ' spec-mode-active' : ''}`}
+            onClick={() => { if (editing) exitEditMode(); setMode('ask'); }}>Ask</button>
+          <button className={`spec-mode-btn${mode === 'edit' ? ' spec-mode-active' : ''}`}
+            onClick={enterEditMode}>Edit</button>
+        </div>
+        {!editing && (
           <form onSubmit={handleSubmit} className="docs-edit-form">
             <div className="docs-edit-input-wrap">
               {sentText && <span className="docs-edit-fly">{sentText}</span>}
@@ -406,7 +451,7 @@ export default function SpecPage() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={busy ? ''
-                  : mode === 'edit'
+                  : mode === 'ai-edit'
                     ? 'AI edit\u2026 e.g. "Add a section about encryption"'
                     : 'Ask\u2026 e.g. "How does mood scoring work?"'}
                 className="docs-edit-input"
@@ -415,8 +460,8 @@ export default function SpecPage() {
               {busy && <span className="docs-edit-dots"><span /><span /><span /></span>}
             </div>
           </form>
-        </div>
-      )}
+        )}
+      </div>
 
       <style jsx>{`
         .spec-layout { display: flex; min-height: calc(100vh - 65px); }
@@ -472,13 +517,17 @@ export default function SpecPage() {
         .spec-main { flex: 1; min-width: 0; max-width: 720px; margin: 0 auto; padding: 4rem 2rem 10rem; }
         @media (max-width: 540px) { .spec-main { padding: 2.5rem 1.5rem 10rem; } }
 
-        .spec-edit-toggle {
-          font-family: 'Montserrat', sans-serif; font-size: 0.6rem; letter-spacing: 0.15em;
-          text-transform: uppercase; color: #a09890; background: none; border: 1px solid #e0dbd5;
-          border-radius: 100px; padding: 0.45rem 1rem; cursor: pointer;
-          transition: all 0.2s ease; margin-bottom: 2rem;
+        .spec-scroll-track {
+          position: fixed; right: 4px; top: 75px; bottom: 10px; width: 8px;
+          z-index: 40; cursor: pointer;
         }
-        .spec-edit-toggle:hover { color: #1a1a1a; border-color: #c17c5f; }
+        .spec-scroll-thumb {
+          position: absolute; right: 0; width: 4px; height: 48px;
+          background: #c17c5f; border-radius: 4px; opacity: 0.35;
+          transform: translateY(-50%); cursor: grab; transition: opacity 0.2s, width 0.15s;
+        }
+        .spec-scroll-track:hover .spec-scroll-thumb,
+        .spec-scroll-thumb:active { opacity: 0.7; width: 6px; }
 
         .spec-edit-bar-inline {
           display: flex; align-items: center; justify-content: space-between;

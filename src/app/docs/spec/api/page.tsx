@@ -13,11 +13,11 @@ You have access to the belo product specification via the GIOIA Spec API. Use it
 
 All requests require the API key:
 \`\`\`
-X-Api-Key: <YOUR_API_KEY>
+X-Api-Key: 21cbf122a3728838b2efcb4c0768933a30aa2aaed54a97b5
 \`\`\`
 Or as a Bearer token:
 \`\`\`
-Authorization: Bearer <YOUR_API_KEY>
+Authorization: Bearer 21cbf122a3728838b2efcb4c0768933a30aa2aaed54a97b5
 \`\`\`
 
 ## Base URL
