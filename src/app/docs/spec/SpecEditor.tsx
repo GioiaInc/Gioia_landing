@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { getSpec, saveSpec, type SpecData } from '@/lib/spec-api';
 import Topbar from './components/Topbar';
 import EditorToolbar from './components/EditorToolbar';
+import type { PageWidth } from './components/EditorToolbar';
 import TiptapEditor, { type TiptapEditorHandle } from './components/TiptapEditor';
 import LeftSidebar from './components/LeftSidebar';
 import RightPanel from './components/RightPanel';
@@ -12,6 +13,13 @@ import type { Editor } from '@tiptap/react';
 import './spec-editor.css';
 
 type PanelTab = 'ai-edit' | 'ask' | 'history';
+
+const PAGE_WIDTH_MAP: Record<PageWidth, string> = {
+  narrow: '640px',
+  default: '816px',
+  wide: '1080px',
+  full: '100%',
+};
 
 function getEditorMarkdown(editor: Editor): string {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -27,6 +35,9 @@ export default function SpecEditor() {
   const [toast, setToast] = useState<string | null>(null);
   const [currentMarkdown, setCurrentMarkdown] = useState('');
   const [editor, setEditor] = useState<Editor | null>(null);
+  const [zoom, setZoom] = useState(100);
+  const [pageWidth, setPageWidth] = useState<PageWidth>('default');
+  const [scrollPct, setScrollPct] = useState(0);
 
   const editorRef = useRef<TiptapEditorHandle>(null);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -40,6 +51,17 @@ export default function SpecEditor() {
       })
       .catch(() => {})
       .finally(() => setLoading(false));
+  }, []);
+
+  // Scroll progress tracker
+  useEffect(() => {
+    const onScroll = () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (docHeight > 0) setScrollPct(Math.min(scrollTop / docHeight, 1));
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   const showToast = useCallback((msg: string) => {
@@ -77,7 +99,7 @@ export default function SpecEditor() {
     setEditor(ed);
   }, []);
 
-  // Ctrl+S / Cmd+S
+  // Ctrl+S / Cmd+S and Ctrl+=/- for zoom
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 's') {
@@ -88,6 +110,18 @@ export default function SpecEditor() {
           const md = getEditorMarkdown(ed);
           doSave(md);
         }
+      }
+      if ((e.metaKey || e.ctrlKey) && (e.key === '=' || e.key === '+')) {
+        e.preventDefault();
+        setZoom((z) => Math.min(200, z + 10));
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key === '-') {
+        e.preventDefault();
+        setZoom((z) => Math.max(50, z - 10));
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key === '0') {
+        e.preventDefault();
+        setZoom(100);
       }
     };
     window.addEventListener('keydown', onKeyDown);
@@ -101,7 +135,6 @@ export default function SpecEditor() {
       setCurrentMarkdown(updated.markdown);
       const ed = editorRef.current?.getEditor();
       if (ed) {
-        // Suppress auto-save since content is already saved server-side
         suppressAutoSaveRef.current = true;
         ed.commands.setContent(updated.markdown);
         suppressAutoSaveRef.current = false;
@@ -172,6 +205,35 @@ export default function SpecEditor() {
     }
   }, [doSave]);
 
+  const handleScrollBarClick = useCallback((e: React.MouseEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const pct = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    window.scrollTo({ top: pct * docHeight, behavior: 'smooth' });
+  }, []);
+
+  const handleScrollBarDrag = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    const track = (e.currentTarget as HTMLElement).parentElement!;
+    const rect = track.getBoundingClientRect();
+    const onMove = (ev: MouseEvent | TouchEvent) => {
+      const clientY = 'touches' in ev ? ev.touches[0].clientY : ev.clientY;
+      const pct = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      window.scrollTo({ top: pct * docHeight });
+    };
+    const onUp = () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+      window.removeEventListener('touchmove', onMove);
+      window.removeEventListener('touchend', onUp);
+    };
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    window.addEventListener('touchmove', onMove);
+    window.addEventListener('touchend', onUp);
+  }, []);
+
   if (loading) {
     return (
       <>
@@ -200,6 +262,12 @@ export default function SpecEditor() {
     );
   }
 
+  const paperStyle = {
+    maxWidth: PAGE_WIDTH_MAP[pageWidth],
+    transform: zoom !== 100 ? `scale(${zoom / 100})` : undefined,
+    transformOrigin: 'top center' as const,
+  };
+
   return (
     <>
       <Topbar />
@@ -216,6 +284,10 @@ export default function SpecEditor() {
             onSave={handleManualSave}
             onExportPDF={handleExportPDF}
             onExportDOCX={handleExportDOCX}
+            zoom={zoom}
+            onZoomChange={setZoom}
+            pageWidth={pageWidth}
+            onPageWidthChange={setPageWidth}
           />
 
           <TiptapEditor
@@ -224,6 +296,7 @@ export default function SpecEditor() {
             onUpdate={handleEditorUpdate}
             onReady={handleEditorReady}
             busy={saving === 'saving'}
+            paperStyle={paperStyle}
           />
         </div>
 
@@ -234,6 +307,16 @@ export default function SpecEditor() {
           onClose={() => setRightPanelOpen(false)}
           onSpecUpdated={handleSpecUpdated}
           onToast={showToast}
+        />
+      </div>
+
+      {/* Right scroll progress bar */}
+      <div className="spec-scroll-track" onClick={handleScrollBarClick}>
+        <div
+          className="spec-scroll-thumb"
+          style={{ top: `${scrollPct * 100}%` }}
+          onMouseDown={handleScrollBarDrag}
+          onTouchStart={handleScrollBarDrag}
         />
       </div>
 

@@ -13,6 +13,7 @@ interface TiptapEditorProps {
   onUpdate?: (editor: Editor) => void;
   onReady?: (editor: Editor) => void;
   busy?: boolean;
+  paperStyle?: React.CSSProperties;
 }
 
 export interface TiptapEditorHandle {
@@ -20,7 +21,7 @@ export interface TiptapEditorHandle {
 }
 
 const TiptapEditor = forwardRef<TiptapEditorHandle, TiptapEditorProps>(
-  function TiptapEditor({ markdown, onUpdate, onReady, busy }, ref) {
+  function TiptapEditor({ markdown, onUpdate, onReady, busy, paperStyle }, ref) {
     const onUpdateRef = useRef(onUpdate);
     onUpdateRef.current = onUpdate;
 
@@ -67,7 +68,7 @@ const TiptapEditor = forwardRef<TiptapEditorHandle, TiptapEditorProps>(
     }, [editor, markdown]);
 
     return (
-      <div className={`spec-paper${busy ? ' spec-paper-busy' : ''}`}>
+      <div className={`spec-paper${busy ? ' spec-paper-busy' : ''}`} style={paperStyle}>
         <EditorContent editor={editor} />
       </div>
     );

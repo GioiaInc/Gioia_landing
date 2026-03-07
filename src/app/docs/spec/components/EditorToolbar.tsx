@@ -3,6 +3,15 @@
 import { useState, useCallback } from 'react';
 import type { Editor } from '@tiptap/react';
 
+type PageWidth = 'narrow' | 'default' | 'wide' | 'full';
+
+const PAGE_WIDTH_LABELS: Record<PageWidth, string> = {
+  narrow: 'Narrow',
+  default: 'Default',
+  wide: 'Wide',
+  full: 'Full',
+};
+
 interface EditorToolbarProps {
   editor: Editor | null;
   saving: 'saved' | 'saving' | 'unsaved';
@@ -11,7 +20,13 @@ interface EditorToolbarProps {
   onSave: () => void;
   onExportPDF: () => void;
   onExportDOCX: () => void;
+  zoom: number;
+  onZoomChange: (zoom: number) => void;
+  pageWidth: PageWidth;
+  onPageWidthChange: (width: PageWidth) => void;
 }
+
+export type { PageWidth };
 
 export default function EditorToolbar({
   editor,
@@ -21,8 +36,13 @@ export default function EditorToolbar({
   onSave,
   onExportPDF,
   onExportDOCX,
+  zoom,
+  onZoomChange,
+  pageWidth,
+  onPageWidthChange,
 }: EditorToolbarProps) {
   const [downloadOpen, setDownloadOpen] = useState(false);
+  const [widthOpen, setWidthOpen] = useState(false);
 
   const btn = useCallback(
     (
@@ -61,6 +81,59 @@ export default function EditorToolbar({
       {btn('1.', () => editor.chain().focus().toggleOrderedList().run(), editor.isActive('orderedList'))}
       {btn('\u201C', () => editor.chain().focus().toggleBlockquote().run(), editor.isActive('blockquote'))}
       {btn('<>', () => editor.chain().focus().toggleCodeBlock().run(), editor.isActive('codeBlock'))}
+
+      <div className="spec-toolbar-divider" />
+
+      {/* Zoom controls */}
+      <button
+        className="spec-toolbar-btn"
+        onClick={() => onZoomChange(Math.max(50, zoom - 10))}
+        title="Zoom out"
+      >
+        &minus;
+      </button>
+      <button
+        className="spec-toolbar-zoom-label"
+        onClick={() => onZoomChange(100)}
+        title="Reset zoom"
+      >
+        {zoom}%
+      </button>
+      <button
+        className="spec-toolbar-btn"
+        onClick={() => onZoomChange(Math.min(200, zoom + 10))}
+        title="Zoom in"
+      >
+        +
+      </button>
+
+      <div className="spec-toolbar-divider" />
+
+      {/* Page width picker */}
+      <div className="spec-toolbar-dropdown">
+        <button
+          className="spec-toolbar-width-btn"
+          onClick={() => setWidthOpen(!widthOpen)}
+          onBlur={() => setTimeout(() => setWidthOpen(false), 150)}
+          title="Page width"
+        >
+          <span className="spec-toolbar-width-icon" />
+          {PAGE_WIDTH_LABELS[pageWidth]}
+        </button>
+        {widthOpen && (
+          <div className="spec-toolbar-dropdown-menu">
+            {(Object.keys(PAGE_WIDTH_LABELS) as PageWidth[]).map((w) => (
+              <button
+                key={w}
+                className={`spec-toolbar-dropdown-item${pageWidth === w ? ' spec-toolbar-dropdown-item-active' : ''}`}
+                onMouseDown={() => { onPageWidthChange(w); setWidthOpen(false); }}
+              >
+                {PAGE_WIDTH_LABELS[w]}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
 
       <div className="spec-toolbar-spacer" />
 
