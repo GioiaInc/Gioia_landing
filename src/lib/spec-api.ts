@@ -105,6 +105,16 @@ export async function revertSpec(editId: number): Promise<{ ok: boolean }> {
   return res.json();
 }
 
+export async function saveSpec(markdown: string): Promise<{ ok: boolean }> {
+  const res = await fetch(`${API_BASE}/api/spec/edit`, {
+    method: 'POST',
+    headers: headers(true),
+    body: JSON.stringify({ markdown, instruction: 'Manual save' }),
+  });
+  if (!res.ok) throw new Error('Save failed');
+  return res.json();
+}
+
 export async function seedSpec(markdown: string, title?: string, force = false): Promise<{ ok: boolean }> {
   const res = await fetch(`${API_BASE}/api/spec/seed`, {
     method: 'POST',
