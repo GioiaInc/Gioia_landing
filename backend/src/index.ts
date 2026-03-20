@@ -6,6 +6,7 @@ import upload from './routes/upload.js';
 import documents from './routes/documents.js';
 import chat from './routes/chat.js';
 import spec from './routes/spec.js';
+import actions from './routes/actions.js';
 
 const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',')
@@ -37,6 +38,7 @@ app.route('/api/upload', upload);
 app.route('/api/documents', documents);
 app.route('/api/chat', chat);
 app.route('/api/spec', spec);
+app.route('/api/actions', actions);
 
 const port = Number(process.env.PORT) || 3001;
 

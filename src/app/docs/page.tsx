@@ -82,6 +82,9 @@ export default function DocsHub() {
           GIOIA Docs
         </Link>
         <div className="docs-topbar-nav">
+          <Link href="/docs/actions" className="docs-topbar-link">
+            Actions
+          </Link>
           <Link href="/docs/spec" className="docs-topbar-link">
             Spec
           </Link>
